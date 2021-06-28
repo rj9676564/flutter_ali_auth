@@ -16,6 +16,9 @@ rootProject.allprojects {
     repositories {
         google()
         jcenter()
+        maven {
+            url "https://d.mrlb.cc:8082/repository/3rd-release/"
+        }
     }
 }
 
@@ -38,6 +41,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.alibaba:fastjson:1.2.61'
     // 更换加载方式
-    implementation fileTree(dir: 'libs', include: ['*.aar','*.jar'])
+    implementation 'cc.mrlb:crashshield:2.0.3:release@aar'
+    implementation 'cc.mrlb:main:2.0.3:release@aar'
+    implementation 'cc.mrlb:logger:2.0.3:release@aar'
+    implementation 'cc.mrlb:phonenumber:2.0.3:release@aar'
     // implementation project(":libs")
 }
