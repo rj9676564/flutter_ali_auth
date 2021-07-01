@@ -47,11 +47,11 @@
     model.numberColor = [self colorWithHex:0x3971fe alpha: 1];
     model.numberFont = [UIFont systemFontOfSize:30.0];
     model.loginBtnText = [[NSAttributedString alloc] initWithString:@"一键登录" attributes:@{NSForegroundColorAttributeName : UIColor.whiteColor,NSFontAttributeName : [UIFont systemFontOfSize:20.0]}];
-//    model.loginBtnBgImgs = @[
-//      [UIImage imageNamed:@"button_click"],
-//      [UIImage imageNamed:@"button_unclick"],
-//      [UIImage imageNamed:@"button_click"]
-//    ];
+    model.loginBtnBgImgs = @[
+      [UIImage imageNamed:@"button_unclick"],
+      [UIImage imageNamed:@"button_unclick"],
+      [UIImage imageNamed:@"button_unclick"]
+    ];
     //model.autoHideLoginLoading = NO;
     // model.privacyOne = @[@"《隐私1》",@"https://www.taobao.com/"];
     //model.privacyTwo = @[@"《隐私2》",@"https://www.taobao.com/"];
@@ -62,7 +62,7 @@
     model.privacyOperatorPreText = @"《";
     model.privacyOperatorSufText = @"》";
     // 是否同意
-    model.checkBoxIsHidden = YES;
+    model.checkBoxIsHidden = NO;
     model.checkBoxWH = 17.0;
     // model.changeBtnTitle = [[NSAttributedString alloc] init];
     model.changeBtnTitle = [
@@ -89,49 +89,35 @@
         }
         return frame;
     };
-    model.sloganFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
-        if ([self isHorizontal:screenSize]) {
-            return CGRectZero; //横屏时模拟隐藏该控件
-        } else {
-            return CGRectMake(0, 140, superViewSize.width, frame.size.height);
-        }
-    };
-    model.numberFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
-        if ([self isHorizontal:screenSize]) {
-            frame.origin.y = 140;
-        }
-        return frame;
-    };
-    model.loginBtnFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
-        if ([self isHorizontal:screenSize]) {
-            frame.origin.y = 185;
-        }
-        return frame;
-    };
-    model.changeBtnFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
-        if ([self isHorizontal:screenSize]) {
-            return CGRectZero; //横屏时模拟隐藏该控件
-        } else {
-            return CGRectMake(10, frame.origin.y, superViewSize.width - 20, 30);
-        }
-    };
+//    model.sloganFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
+//        if ([self isHorizontal:screenSize]) {
+//            return CGRectZero; //横屏时模拟隐藏该控件
+//        } else {
+//            return CGRectMake(0, 140, superViewSize.width, frame.size.height);
+//        }
+//    };
+//    model.numberFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
+//        if ([self isHorizontal:screenSize]) {
+//            frame.origin.y = 140;
+//        }
+//        return frame;
+//    };
+//    model.loginBtnFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
+//        if ([self isHorizontal:screenSize]) {
+//            frame.origin.y = 185;
+//        }
+//        return frame;
+//    };
+//    model.changeBtnFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
+//        if ([self isHorizontal:screenSize]) {
+//            return CGRectZero; //横屏时模拟隐藏该控件
+//        } else {
+//            return CGRectMake(10, frame.origin.y, superViewSize.width - 20, 30);
+//        }
+//    };
     //model.privacyFrameBlock =
     
-    //添加自定义控件并对自定义控件进行布局
-//    __block UIButton *customBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    // [customBtn setTitle:@"这是一个自定义控件" forState:UIControlStateNormal];
-//    [customBtn setBackgroundColor:UIColor.redColor];
-//    customBtn.frame = CGRectMake(0, 0, 230, 40);
-    // model.customViewBlock = ^(UIView * _Nonnull superCustomView) {
-    //      [superCustomView addSubview:customBtn];
-    // };
-    // model.customViewLayoutBlock = ^(CGSize screenSize, CGRect contentViewFrame, CGRect navFrame, CGRect titleBarFrame, CGRect logoFrame, CGRect sloganFrame, CGRect numberFrame, CGRect loginFrame, CGRect changeBtnFrame, CGRect privacyFrame) {
-    //     CGRect frame = customBtn.frame;
-    //     frame.origin.x = (contentViewFrame.size.width - frame.size.width) * 0.5;
-    //     frame.origin.y = CGRectGetMinY(privacyFrame) - frame.size.height - 20;
-    //     frame.size.width = contentViewFrame.size.width - frame.origin.x * 2;
-    //     customBtn.frame = frame;
-    // };
+    
     return model;
 }
 
