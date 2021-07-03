@@ -68,6 +68,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
+            android:background="#FFFF00"
             android:src="@drawable/apple" />
 
 

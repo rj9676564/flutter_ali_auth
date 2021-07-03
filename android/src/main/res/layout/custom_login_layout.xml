@@ -35,12 +35,6 @@
             android:layout_marginRight="10dp"
             android:src="@drawable/sina" />
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:src="@drawable/apple" />
 
     </LinearLayout>
 

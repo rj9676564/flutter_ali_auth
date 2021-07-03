@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,6 +27,7 @@ import com.mobile.auth.gatewayauth.TokenResultListener;
 import com.mobile.auth.gatewayauth.model.TokenRet;
 import com.mobile.auth.gatewayauth.ui.AbstractPnsViewDelegate;
 
+import io.flutter.Log;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
@@ -55,7 +55,7 @@ public class MainPortraitActivity implements PluginRegistry.ActivityResultListen
         this.activity = activity;
         this.context = context;
     }
-    
+
     @Override
     public boolean onActivityResult(int i, int i1, Intent intent) {
         return false;
@@ -156,13 +156,9 @@ public class MainPortraitActivity implements PluginRegistry.ActivityResultListen
             }
         });
 
-        // 判断是否使用dialog登录
-        boolean type = (boolean) call.argument("type");
-        if(type){
-            configLoginTokenPort(call, methodResult);
-        } else {
-            configLoginTokenPortDialog(call, methodResult);
-        }
+
+        configLoginTokenPort(call, methodResult);
+
 
         preLogin(call, methodResult);
     }
@@ -175,7 +171,7 @@ public class MainPortraitActivity implements PluginRegistry.ActivityResultListen
     public boolean checkVerifyEnable(MethodCall call, MethodChannel.Result result) {
         // 判断网络是否支持
         boolean checkRet = mAlicomAuthHelper.checkEnvAvailable();
-        if (!checkRet){
+        if (!checkRet) {
             Log.d(TAG, ("当前网络不支持，请检测蜂窝网络后重试"));
         }
 
@@ -183,7 +179,9 @@ public class MainPortraitActivity implements PluginRegistry.ActivityResultListen
         return checkRet;
     }
 
-    /** SDK设置debug模式 */
+    /**
+     * SDK设置debug模式
+     */
     public void setDebugMode(MethodCall call, MethodChannel.Result result) {
         Object enable = getValueByKey(call, "debug");
         if (enable != null) {
@@ -195,11 +193,13 @@ public class MainPortraitActivity implements PluginRegistry.ActivityResultListen
         result.success(jsonObject);
     }
 
-    /** SDK 一键登录预取号 */
+    /**
+     * SDK 一键登录预取号
+     */
     public void preLogin(MethodCall call, final MethodChannel.Result result) {
         int timeOut = 5000;
         if (call.hasArgument("timeOut")) {
-        Integer value = call.argument("timeOut");
+            Integer value = call.argument("timeOut");
             timeOut = value;
         }
 
@@ -235,25 +235,25 @@ public class MainPortraitActivity implements PluginRegistry.ActivityResultListen
     }
 
     // 正常登录
-    public void login(final MethodCall call, final MethodChannel.Result methodResult){
+    public void login(final MethodCall call, final MethodChannel.Result methodResult) {
         getAuthListener(call, methodResult);
         mAlicomAuthHelper.getLoginToken(context, 5000);
     }
 
     // dialog登录
-    public void loginDialog(final MethodCall call, final MethodChannel.Result methodResult){
+    public void loginDialog(final MethodCall call, final MethodChannel.Result methodResult) {
         getAuthListener(call, methodResult);
         mAlicomAuthHelper.getLoginToken(context, 5000);
     }
 
     // 获取登录token
-    public void getToken(final MethodCall call, final MethodChannel.Result methodResult){
+    public void getToken(final MethodCall call, final MethodChannel.Result methodResult) {
         getAuthListener(call, methodResult);
         mAlicomAuthHelper.getVerifyToken(5000);
     }
 
     // 获取监听数据
-    private void getAuthListener(final MethodCall call, final MethodChannel.Result methodResult){
+    private void getAuthListener(final MethodCall call, final MethodChannel.Result methodResult) {
         mAlicomAuthHelper.setAuthListener(new TokenResultListener() {
             @Override
             public void onTokenSuccess(final String ret) {
@@ -279,6 +279,7 @@ public class MainPortraitActivity implements PluginRegistry.ActivityResultListen
                     }
                 });
             }
+
             @Override
             public void onTokenFailed(final String ret) {
                 activity.runOnUiThread(new Runnable() {
@@ -316,7 +317,7 @@ public class MainPortraitActivity implements PluginRegistry.ActivityResultListen
 //        switchTV.setLayoutParams(mLayoutParams2);
     }
 
-    private ImageView createLandDialogPhoneNumberIcon( float rightMargin, float topMargin, float fontSize) {
+    private ImageView createLandDialogPhoneNumberIcon(float rightMargin, float topMargin, float fontSize) {
         ImageView imageView = new ImageView(context);
         int size = AppUtils.dp2px(context, fontSize);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
@@ -364,7 +365,7 @@ public class MainPortraitActivity implements PluginRegistry.ActivityResultListen
     // ⼀键登录授权⻚⾯
     private void configLoginTokenPort(final MethodCall call, final MethodChannel.Result methodResult) {
         initDynamicView();
-        Log.d(TAG, "configLoginTokenPort: "+call.arguments);
+        Log.d(TAG, "configLoginTokenPort: " + call.arguments);
         mAlicomAuthHelper.removeAuthRegisterXmlConfig();
         mAlicomAuthHelper.removeAuthRegisterViewConfig();
 
@@ -404,134 +405,70 @@ public class MainPortraitActivity implements PluginRegistry.ActivityResultListen
 //                         .setView(createLandDialogPhoneNumberIcon(0, 0, 200))
 //                         .build());
 
-        final View switchContainer = createLandDialogCustomSwitchView(250,0, 0, 24);
+        final View switchContainer = createLandDialogCustomSwitchView(250, 0, 0, 24);
 
         // 添加文字布局
         mAlicomAuthHelper.addAuthRegisterXmlConfig(new AuthRegisterXmlConfig.Builder()
-            .setLayout(R.layout.custom_slogan, new AbstractPnsViewDelegate() {
-                @Override public void onViewCreated(View view) {
-                    findViewById(R.id.slogan_title).setOnClickListener(new View.OnClickListener() {
-                        @Override public void onClick(View v) {
-                            Log.d(TAG, ("slogan 被点击了"));
-                        }
-                    });
-                }
-            })
-            .build());
+                .setLayout(R.layout.custom_slogan, new AbstractPnsViewDelegate() {
+                    @Override
+                    public void onViewCreated(View view) {
+                        findViewById(R.id.slogan_title).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                            }
+                        });
+                    }
+                })
+                .build());
 
         int authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
         if (Build.VERSION.SDK_INT == 26) {
             authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_BEHIND;
         }
         mAlicomAuthHelper.setAuthUIConfig(
-            new AuthUIConfig.Builder()
-            // 状态栏背景色
-            .setStatusBarColor(Color.parseColor("#ffffff"))
-            // .setStatusBarColor(Color.TRANSPARENT)
-            .setLightColor(true)
-            // 导航栏设置
-            .setNavHidden(true)
-            .setNavColor(Color.parseColor("#3971fe")) // 导航栏背景色
-            .setNavText("本机号码一键登录") // 导航栏背景色
-            .setAppPrivacyColor(Color.GRAY, Color.parseColor("#3971fe"))
-            // logo设置
-            .setLogoHidden(true)
-            .setLogoImgPath("ic_launcher")
-            // slogan 设置
-            .setSloganHidden(true)
-            // 号码设置
-            .setNumberColor(Color.parseColor("#3C4F5E"))
-            // 按钮设置
-            .setLogBtnBackgroundPath("button")
-            .setLogBtnHeight(38)
-            .setAuthPageActIn("in_activity", "out_activity")
-            .setAuthPageActOut("in_activity", "out_activity")
-            .setVendorPrivacyPrefix("《")
-            .setVendorPrivacySuffix("》")
-            // 切换到其他登录方式
-            .setSwitchAccTextColor(Color.parseColor("#3A71FF"))
-            .setSwitchAccText("使用验证码登录")
-            .setScreenOrientation(authPageOrientation)
-            // 勾选框
-            .setCheckboxHidden(false)
-            // 勾选框后方文字
-            // .setPrivacyBefore("sadadasda")
-            .setPrivacyState(false)
-            // .setLogBtnBackgroundPath("slogan")
-            //.setPrivacyBefore("《达理用户协议》")
-            .setAppPrivacyOne("《达理用户协议》", "https://www.baidu.com")
-            .setAppPrivacyTwo("《达理用户隐私》", "https://www.baidu.com")
-            //.setStatusBarUIFlag(View.SYSTEM_UI_FLAG_LOW_PROFILE) // 沉浸式，需隐藏状态栏否则会出现和状态栏重叠的问题
-            .setStatusBarUIFlag(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN) // 沉浸式，需隐藏状态栏否则会出现和状态栏重叠的问题
-            // 手机底部虚拟部分颜色
-            .setBottomNavColor(Color.parseColor("#ffffff"))
-            .create()
-        );
-    }
-    // 弹窗授权⻚⾯
-    private void configLoginTokenPortDialog(final MethodCall call, final MethodChannel.Result methodResult) {
-        // initDynamicView();
-        mAlicomAuthHelper.removeAuthRegisterXmlConfig();
-        mAlicomAuthHelper.removeAuthRegisterViewConfig();
-        int authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
-        if (Build.VERSION.SDK_INT == 26) {
-            authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_BEHIND;
-        }
-        updateScreenSize(authPageOrientation);
-        int dialogWidth = (int) (mScreenWidthDp * 0.8f);
-        int dialogHeight = (int) (mScreenHeightDp * 0.65f);
-        // mAlicomAuthHelper.addAuthRegisterXmlConfig(
-        //     new AuthRegisterXmlConfig.Builder().setLayout(R.layout.custom_port_dialog_action_bar, new AbstractPnsViewDelegate() {
-        //         @Override
-        //         public void onViewCreated(View view) {
-        //             findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener() {
-        //                 @Override
-        //                 public void onClick(View v) {
-        //                     mAlicomAuthHelper.quitLoginPage();
-        //                 }
-        //             });
-        //         }
-        //     }).build()
-        // );
-        int logBtnOffset = dialogHeight / 2;
-        mAlicomAuthHelper.setAuthUIConfig(
-            new AuthUIConfig.Builder()
-            // .setAppPrivacyOne("《自定义隐私协议》", "https://www.baidu.com")
-            .setAppPrivacyColor(Color.GRAY, Color.parseColor("#3971fe"))
-            .setPrivacyState(false)
-            .setCheckboxHidden(true)
-//            .setNavHidden(false)
-//            .setNavColor(Color.parseColor("#3971fe"))
-//            .setNavReturnImgPath("icon_close")
-            .setWebNavColor(Color.parseColor("#3971fe"))
-            .setAuthPageActIn("in_activity", "out_activity")
-            .setAuthPageActOut("in_activity", "out_activity")
-            .setVendorPrivacyPrefix("《")
-            .setVendorPrivacySuffix("》")
-            .setLogoImgPath("ic_launcher")
-            .setLogBtnWidth(dialogWidth - 30)
-            .setLogBtnMarginLeftAndRight(15)
-            .setLogBtnBackgroundPath("button")
-            .setLogoOffsetY(48)
-            .setLogoWidth(42)
-            .setLogoHeight(42)
-            .setLogBtnOffsetY(logBtnOffset)
-            .setSloganText("为了您的账号安全，请先绑定手机号")
-            .setSloganOffsetY(logBtnOffset - 100)
-            .setSloganTextSize(11)
-            .setNumFieldOffsetY(logBtnOffset - 50)
-            .setSwitchOffsetY(logBtnOffset + 50)
-            .setSwitchAccTextSize(11)
-//            .setPageBackgroundPath("dialog_background_color")
-            .setNumberSize(17)
-            .setLogBtnHeight(38)
-            .setLogBtnTextSize(16)
-            .setDialogWidth(dialogWidth)
-            .setDialogHeight(dialogHeight)
-            .setDialogBottom(false)
-//            .setDialogAlpha(82)
-            .setScreenOrientation(authPageOrientation)
-            .create()
+                new AuthUIConfig.Builder()
+                        // 状态栏背景色
+                        .setStatusBarColor(Color.parseColor("#ffffff"))
+                        // .setStatusBarColor(Color.TRANSPARENT)
+                        .setLightColor(true)
+                        // 导航栏设置
+                        .setNavHidden(true)
+                        .setNavColor(Color.parseColor("#3971fe")) // 导航栏背景色
+                        .setNavText("本机号码一键登录") // 导航栏背景色
+                        .setAppPrivacyColor(Color.GRAY, Color.parseColor("#3971fe"))
+                        // logo设置
+                        .setLogoHidden(true)
+                        .setLogoImgPath("ic_launcher")
+                        // slogan 设置
+                        .setSloganHidden(true)
+                        // 号码设置
+                        .setNumberColor(Color.parseColor("#3C4F5E"))
+                        // 按钮设置
+                        .setLogBtnBackgroundPath("button")
+                        .setLogBtnHeight(38)
+                        .setAuthPageActIn("in_activity", "out_activity")
+                        .setAuthPageActOut("in_activity", "out_activity")
+                        .setVendorPrivacyPrefix("《")
+                        .setVendorPrivacySuffix("》")
+                        // 切换到其他登录方式
+                        .setSwitchAccTextColor(Color.parseColor("#3A71FF"))
+                        .setSwitchAccText("使用验证码登录")
+                        .setScreenOrientation(authPageOrientation)
+                        // 勾选框
+                        .setCheckboxHidden(false)
+                        // 勾选框后方文字
+                        // .setPrivacyBefore("sadadasda")
+                        .setPrivacyState(false)
+                        // .setLogBtnBackgroundPath("slogan")
+                        //.setPrivacyBefore("《达理用户协议》")
+                        .setAppPrivacyOne("《达理用户协议》", "https://www.baidu.com")
+                        .setAppPrivacyTwo("《达理用户隐私》", "https://www.baidu.com")
+                        //.setStatusBarUIFlag(View.SYSTEM_UI_FLAG_LOW_PROFILE) // 沉浸式，需隐藏状态栏否则会出现和状态栏重叠的问题
+                        .setStatusBarUIFlag(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN) // 沉浸式，需隐藏状态栏否则会出现和状态栏重叠的问题
+                        // 手机底部虚拟部分颜色
+                        .setBottomNavColor(Color.parseColor("#ffffff"))
+                        .create()
         );
     }
 
@@ -548,11 +485,11 @@ public class MainPortraitActivity implements PluginRegistry.ActivityResultListen
     public static String getNetworkClass(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
-        if(info==null || !info.isConnected())
+        if (info == null || !info.isConnected())
             return "-"; //not connected
-        if(info.getType() == ConnectivityManager.TYPE_WIFI)
+        if (info.getType() == ConnectivityManager.TYPE_WIFI)
             return "WIFI";
-        if(info.getType() == ConnectivityManager.TYPE_MOBILE){
+        if (info.getType() == ConnectivityManager.TYPE_MOBILE) {
             int networkType = info.getSubtype();
             switch (networkType) {
                 case TelephonyManager.NETWORK_TYPE_GPRS:

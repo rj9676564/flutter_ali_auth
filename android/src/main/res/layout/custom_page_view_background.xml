@@ -27,7 +27,7 @@
             android:layout_centerInParent="true"
             android:layout_marginLeft="40dp"
             android:layout_marginTop="300dp"
-            android:text="您好，\n欢迎使用达理 · 师傅端"
+            android:text="您好，\n欢迎使用达理 · 9999师傅端"
             android:textColor="@android:color/darker_gray"
             android:textSize="24sp"
             android:textStyle="bold"

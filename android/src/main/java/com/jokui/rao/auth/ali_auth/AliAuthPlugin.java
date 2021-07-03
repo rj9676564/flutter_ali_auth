@@ -24,7 +24,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -52,7 +54,9 @@ import java.util.Map;
 import static com.jokui.rao.auth.ali_auth.AppUtils.dp2px;
 import static com.mobile.auth.gatewayauth.PhoneNumberAuthHelper.SERVICE_TYPE_LOGIN;
 
-/** AliAuthPlugin */
+/**
+ * AliAuthPlugin
+ */
 public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, MethodCallHandler, ActivityAware, EventChannel.StreamHandler {
 
     private final String TAG = "MainPortraitActivity";
@@ -108,27 +112,27 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
             case "init":
                 _call = call;
                 _methodResult = result;
-                if( _events != null){
+                if (_events != null) {
                     init();
                 }
                 break;
             case "getToken":
-                getToken(call,result);
+                getToken(call, result);
                 break;
             case "preLogin":
-                preLogin(call,result);
+                preLogin(call, result);
                 break;
             case "login":
-                login(call,result);
+                login(call, result);
                 break;
             case "loginDialog":
-                loginDialog(call,result);
+                loginDialog(call, result);
                 break;
             case "checkVerifyEnable":
-                checkVerifyEnable(call,result);
+                checkVerifyEnable(call, result);
                 break;
             case "setDebugMode":
-                setDebugMode(call,result);
+                setDebugMode(call, result);
                 break;
             default:
                 throw new IllegalArgumentException("Unkown operation" + call.method);
@@ -165,9 +169,9 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
 
     @Override
     public void onListen(Object arguments, EventChannel.EventSink events) {
-        Log.d("TAG", "onListen: "+events);
+        Log.d("TAG", "onListen: " + events);
         /// 经过测试有时onlisten执行在onMethodCall至后
-        if( _events == null && events != null){
+        if (_events == null && events != null) {
             _events = events;
             init();
         }
@@ -175,11 +179,10 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
 
     @Override
     public void onCancel(Object arguments) {
-        if( _events != null){
+        if (_events != null) {
             _events = null;
         }
     }
-
 
 
     private void init() {
@@ -188,7 +191,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         final JSONObject jsonObject = new JSONObject();
 
         /// 判断必要参数
-        if(!_call.hasArgument("config") || viewConfig == null || !_call.hasArgument("sk")){
+        if (!_call.hasArgument("config") || viewConfig == null || !_call.hasArgument("sk")) {
             Log.d(TAG, ("检测config 配置信息"));
             jsonObject.put("code", "500000");
             jsonObject.put("msg", "The required parameter config or sk cannot be empty, please check the parameter configuration");
@@ -244,11 +247,11 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
 
         mAlicomAuthHelper.setAuthSDKInfo((String) _call.argument("sk"));
         // 设置是否开启debug模式
-        boolean isDebug =  !viewConfig.containsKey("isDebug") || viewConfig.get("isDebug") == null || (boolean) viewConfig.get("isDebug");
+        boolean isDebug = !viewConfig.containsKey("isDebug") || viewConfig.get("isDebug") == null || (boolean) viewConfig.get("isDebug");
         mAlicomAuthHelper.getReporter().setLoggerEnable(isDebug);
 
         // 设置初始化界面的参数
-        boolean isDialog =  !viewConfig.containsKey("isDialog") || viewConfig.get("isDialog") == null || !(boolean) viewConfig.get("isDialog");
+        boolean isDialog = !viewConfig.containsKey("isDialog") || viewConfig.get("isDialog") == null || !(boolean) viewConfig.get("isDialog");
         if (isDialog) {
             configLoginTokenPort(_call, _methodResult);
         } else {
@@ -299,16 +302,18 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
             //转化成json字符串
             _events.success(jsonObject);
             return true;
-        }else {
+        } else {
             return super.onKeyDown(keyCode, event);
         }
     }
 
-    /** SDK 判断网络环境是否支持 */
+    /**
+     * SDK 判断网络环境是否支持
+     */
     public boolean checkVerifyEnable(MethodCall call, MethodChannel.Result result) {
         // 判断网络是否支持
         boolean checkRet = mAlicomAuthHelper.checkEnvAvailable();
-        if (!checkRet){
+        if (!checkRet) {
             Log.d(TAG, ("当前网络不支持，请检测蜂窝网络后重试"));
         }
 
@@ -316,7 +321,9 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         return checkRet;
     }
 
-    /** SDK设置debug模式 */
+    /**
+     * SDK设置debug模式
+     */
     public void setDebugMode(MethodCall call, MethodChannel.Result result) {
         Object enable = getValueByKey(call, "debug");
         if (enable != null) {
@@ -328,7 +335,9 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         result.success(jsonObject);
     }
 
-    /** SDK 一键登录预取号 */
+    /**
+     * SDK 一键登录预取号
+     */
     public void preLogin(MethodCall call, final MethodChannel.Result result) {
         int timeOut = 5000;
         if (call.hasArgument("timeOut")) {
@@ -366,26 +375,71 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
             }
         });
     }
+
     // 正常登录
-    public void login(final MethodCall call, final MethodChannel.Result methodResult){
+    public void login(final MethodCall call, final MethodChannel.Result methodResult) {
+
+        int authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+        if (Build.VERSION.SDK_INT == 26) {
+            authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_BEHIND;
+        }
+        mAlicomAuthHelper.setAuthUIConfig(new AuthUIConfig.Builder()
+                .setAppPrivacyOne("《自定义隐私协议》", "https://test.h5.app.tbmao.com/user")
+                .setAppPrivacyTwo("《百度》", "https://www.baidu.com")
+                .setAppPrivacyColor(Color.GRAY, Color.parseColor("#002E00"))
+                .setSwitchAccHidden(false)
+                .setPrivacyState(false)
+                .setCheckboxHidden(false)
+                .setLightColor(true)
+                .setCheckboxHidden(false)
+//                .setStatusBarHidden(true)
+//                .setStatusBarColor(Color.WHITE)
+                .setNavColor(Color.WHITE)
+                .setNavTextColor(Color.BLACK)
+                .setNavReturnImgPath("icon_nav_back_gray")
+                .setNavReturnHidden(false)
+//                .setStatusBarUIFlag(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+                .setSloganHidden(true)
+                .setWebNavTextSizeDp(20)
+                .setNumberSizeDp(30)
+                .setNumFieldOffsetY(230)
+                .setLogBtnOffsetY(300)
+
+                .setLogoImgPath("loginimg")
+                .setLogoWidth(160)
+                .setLogoHeight(160)
+                .setLogoOffsetY(40)
+                .setSwitchAccHidden(true)
+//                .setAuthPageActIn("in_activity", "out_activity")
+//                .setAuthPageActOut("in_activity", "out_activity")
+//                .setVendorPrivacyPrefix("《")
+//                .setVendorPrivacySuffix("》")
+//                .setPageBackgroundPath("page_background_color")
+//                .setLogoImgPath("loginimg")
+//                .setLogBtnBackgroundPath("login_btn_bg")
+//                .setScreenOrientation(authPageOrientation)
+                .create());
+
+        initDynamicView(call);
         getAuthListener();
+
         mAlicomAuthHelper.getLoginToken(mContext, 5000);
     }
 
     // dialog登录
-    public void loginDialog(final MethodCall call, final MethodChannel.Result methodResult){
+    public void loginDialog(final MethodCall call, final MethodChannel.Result methodResult) {
         getAuthListener();
         mAlicomAuthHelper.getLoginToken(mContext, 5000);
     }
 
     // 获取登录token
-    public void getToken(final MethodCall call, final MethodChannel.Result methodResult){
+    public void getToken(final MethodCall call, final MethodChannel.Result methodResult) {
         getAuthListener();
         mAlicomAuthHelper.getVerifyToken(5000);
     }
 
     // 获取监听数据
-    private void getAuthListener(){
+    private void getAuthListener() {
         mAlicomAuthHelper.setAuthListener(new TokenResultListener() {
             @Override
             public void onTokenSuccess(final String ret) {
@@ -403,6 +457,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                     }
                 });
             }
+
             @Override
             public void onTokenFailed(final String ret) {
                 activity.runOnUiThread(new Runnable() {
@@ -422,11 +477,11 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         });
     }
 
-    private void resultData(TokenRet tokenRet){
+    private void resultData(TokenRet tokenRet) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("data", null);
 
-        switch (tokenRet.getCode()){
+        switch (tokenRet.getCode()) {
             case "600000":
                 token = tokenRet.getToken();
                 mAlicomAuthHelper.quitLoginPage();
@@ -509,7 +564,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         layoutParams.topMargin = topMargin; //AppUtils.px2dp(mContext, topMargin);
         layoutParams.rightMargin = rightMargin; //AppUtils.px2dp(mContext, rightMargin);
         imageView.setLayoutParams(layoutParams);
-        int resoureId = mContext.getResources().getIdentifier(name,"drawable", mContext.getPackageName());
+        int resoureId = mContext.getResources().getIdentifier(name, "drawable", mContext.getPackageName());
         imageView.setBackgroundResource(resoureId);
         imageView.setScaleType(ImageView.ScaleType.CENTER);
         return imageView;
@@ -545,63 +600,79 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     }
 
     // 自定义UI
-    private void initDynamicView( MethodCall call ) {
+    private void initDynamicView(MethodCall call) {
+        android.util.Log.e(TAG, "initDynamicView: " );
         Map viewConfig = (Map) call.argument("config");
-        
-        if (dataStatus( viewConfig, "isHiddenCustom")) {
-            int getCustomXml = mContext.getResources().getIdentifier("custom_login", "layout", mContext.getPackageName());
-            // 判断是否有自定义布局文件，没有则加载默认布局文件
-            if(getCustomXml == 0){
-                getCustomXml = mContext.getResources().getIdentifier("custom_login_layout", "layout", mContext.getPackageName());
-            }
-            switchTV = LayoutInflater.from(mContext).inflate(getCustomXml, new RelativeLayout(mContext), false);
-            RelativeLayout.LayoutParams mLayoutParams2 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, dp2px(activity, 150));
-            mLayoutParams2.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-            mLayoutParams2.setMargins(0, dp2px(mContext, 400), 0, 0);
 
-            // 获取到图片列表的父控件
-            LinearLayout list = switchTV.findViewById(R.id.container_icon);
-            // 循环监听图片按钮
-            for (int i = 0; i < list.getChildCount(); i++) {
-                View view = list.getChildAt(i);
-                if (view instanceof ImageView) {
-                    final int finalI = i;
-                    view.setOnClickListener(new View.OnClickListener() {
-                        @Override public void onClick(View v) {
-                            Log.d(TAG, "您点击了第" + finalI + "个按钮");
-                            JSONObject jsonObject = new JSONObject();
-                            jsonObject.put("code", "700005");
-                            jsonObject.put("msg", "点击第三方登录按钮");
-                            jsonObject.put("data", finalI);
-                            //转化成json字符串
-                            _events.success(jsonObject);
+//        if (dataStatus( viewConfig, "isHiddenCustom")) {
+        int getCustomXml = mContext.getResources().getIdentifier("custom_login", "layout", mContext.getPackageName());
+        switchTV = LayoutInflater.from(mContext).inflate(getCustomXml, new RelativeLayout(mContext), false);
+        RelativeLayout.LayoutParams mLayoutParams2 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, dp2px(activity, 100));
+        mLayoutParams2.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager()
+                .getDefaultDisplay()
+                .getMetrics(displayMetrics);
+//            mLayoutParams2.setMargins(0, dp2px(mContext, 400), 0, 0);
+        mLayoutParams2.setMargins(0, displayMetrics.heightPixels - dp2px(mContext, 220), 0, 0);
+
+        // 获取到图片列表的父控件
+        LinearLayout list = switchTV.findViewById(R.id.container_icon);
+        // 循环监听图片按钮
+        for (int i = 0; i < list.getChildCount(); i++) {
+            View view = list.getChildAt(i);
+            if (view instanceof ImageView) {
+                final int finalI = i;
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d(TAG, "您点击了第" + finalI + "个按钮");
+                        JSONObject jsonObject = new JSONObject();
+                        if (finalI == 0) {
+                            jsonObject.put("data", "10000");
+                            jsonObject.put("code", "10000");
                         }
-                    });
-                }
-            }
+                        if (finalI == 1) {
+                            jsonObject.put("data", "10001");
+                            jsonObject.put("code", "10001");
+                        }
+                        if (finalI == 2) {
+                            jsonObject.put("data", "10002");
+                            jsonObject.put("code", "10002");
+                        }
 
-            switchTV.setLayoutParams(mLayoutParams2);
+                        jsonObject.put("msg", "点击第三方登录按钮");
+                        mAlicomAuthHelper.quitLoginPage();
+                        //转化成json字符串
+                        _events.success(jsonObject);
+
+                    }
+                });
+            }
         }
+
+        switchTV.setLayoutParams(mLayoutParams2);
+//        }
     }
 
     // 自定义背景
-    private void initBackgroundView( MethodCall call ) {
+    private void initBackgroundView(MethodCall call) {
         Map viewConfig = (Map) call.argument("config");
 
-        if(dataStatus( viewConfig, "customPageBackgroundLyout")){
-            int getCustomXml = mContext.getResources().getIdentifier("custom_page_background", "layout", mContext.getPackageName());
-            // 判断是否有自定义布局文件，没有则加载默认布局文件
-            if(getCustomXml == 0){
-                getCustomXml = mContext.getResources().getIdentifier("custom_page_view_background", "layout", mContext.getPackageName());
-            }
-            mAlicomAuthHelper.addAuthRegisterXmlConfig(new AuthRegisterXmlConfig.Builder()
-                .setLayout(getCustomXml, new AbstractPnsViewDelegate() {
-                    @Override
-                    public void onViewCreated(View view) {
-                    }
-                })
-                .build());
-        }
+//        if(dataStatus( viewConfig, "customPageBackgroundLyout")){
+//            int getCustomXml = mContext.getResources().getIdentifier("custom_page_background", "layout", mContext.getPackageName());
+//            // 判断是否有自定义布局文件，没有则加载默认布局文件
+//            if(getCustomXml == 0){
+//                getCustomXml = mContext.getResources().getIdentifier("custom_page_view_background", "layout", mContext.getPackageName());
+//            }
+//            mAlicomAuthHelper.addAuthRegisterXmlConfig(new AuthRegisterXmlConfig.Builder()
+//                .setLayout(getCustomXml, new AbstractPnsViewDelegate() {
+//                    @Override
+//                    public void onViewCreated(View view) {
+//                    }
+//                })
+//                .build());
+//        }
     }
 
     /// ⼀键登录授权⻚⾯
@@ -614,25 +685,25 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
 
         /// 添加第三方登录按钮
         mAlicomAuthHelper.addAuthRegistViewConfig(
-            "switch_acc_tv",
-            new AuthRegisterViewConfig.Builder()
-                .setView(switchTV)
-                .setRootViewId(AuthRegisterViewConfig.RootViewId.ROOT_VIEW_ID_BODY)
-                .build()
+                "switch_acc_tv",
+                new AuthRegisterViewConfig.Builder()
+                        .setView(switchTV)
+                        .setRootViewId(AuthRegisterViewConfig.RootViewId.ROOT_VIEW_ID_BODY)
+                        .build()
         );
 
     }
 
     /// 判断数据
-    private boolean dataStatus( Map data, String key ){
-        if(data.containsKey(key) && data.get(key) != null){
-            if((data.get(key) instanceof Float) || (data.get(key) instanceof Double) && (double) data.get(key) > -1){
+    private boolean dataStatus(Map data, String key) {
+        if (data.containsKey(key) && data.get(key) != null) {
+            if ((data.get(key) instanceof Float) || (data.get(key) instanceof Double) && (double) data.get(key) > -1) {
                 return true;
-            } else if((data.get(key) instanceof Integer) || (data.get(key) instanceof Number) && (int) data.get(key) > -1){
+            } else if ((data.get(key) instanceof Integer) || (data.get(key) instanceof Number) && (int) data.get(key) > -1) {
                 return true;
-            } else if((data.get(key) instanceof Boolean) && (boolean) data.get(key)){
+            } else if ((data.get(key) instanceof Boolean) && (boolean) data.get(key)) {
                 return true;
-            } else if((data.get(key) instanceof String) && !((String) data.get(key)).equals("")){
+            } else if ((data.get(key) instanceof String) && !((String) data.get(key)).equals("")) {
                 return true;
             } else {
                 return false;
@@ -650,7 +721,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     }
 
     // 公共配置
-    private void configBuilder(final MethodCall call){
+    private void configBuilder(final MethodCall call) {
         mAlicomAuthHelper.removeAuthRegisterXmlConfig();
         mAlicomAuthHelper.removeAuthRegisterViewConfig();
 
@@ -667,356 +738,355 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         int dialogWidth = (int) (mScreenWidthDp * 0.8f);
         int dialogHeight = (int) (mScreenHeightDp * 0.65f);
         /// 设置弹窗模式授权⻚宽度，单位dp，设置⼤于0即为弹窗模式
-        if(dataStatus( viewConfig, "dialogWidth")){
-            if((int) viewConfig.get("dialogWidth") > 0){
+        if (dataStatus(viewConfig, "dialogWidth")) {
+            if ((int) viewConfig.get("dialogWidth") > 0) {
                 dialogWidth = (int) viewConfig.get("dialogWidth");
                 config.setDialogWidth(dialogWidth);
             }
         } else {
-            if(dataStatus( viewConfig, "isDialog")){
+            if (dataStatus(viewConfig, "isDialog")) {
                 config.setDialogWidth(dialogWidth);
             }
         }
 
         /// 设置弹窗模式授权⻚⾼度，单位dp，设置⼤于0即为弹窗模式
-        if(dataStatus( viewConfig, "dialogHeight")){
-            if((int) viewConfig.get("dialogHeight") > 0){
+        if (dataStatus(viewConfig, "dialogHeight")) {
+            if ((int) viewConfig.get("dialogHeight") > 0) {
                 dialogHeight = (int) viewConfig.get("dialogHeight");
                 config.setDialogHeight(dialogHeight);
             }
         } else {
-            if(dataStatus( viewConfig, "isDialog")){
+            if (dataStatus(viewConfig, "isDialog")) {
                 config.setDialogHeight(dialogHeight);
             }
         }
 
         /// statusBarColor 设置状态栏颜⾊（系统版本 5.0 以上可设置）
-        if(dataStatus( viewConfig, "statusBarColor")){
+        if (dataStatus(viewConfig, "statusBarColor")) {
             config.setStatusBarColor(Color.parseColor((String) viewConfig.get("statusBarColor")));
         }
         /// 设置状态栏字体颜⾊（系统版本 6.0 以上可21设置⿊⾊、⽩⾊）。true 为⿊⾊
-        if(dataStatus( viewConfig, "lightColor")){
+        if (dataStatus(viewConfig, "lightColor")) {
             config.setLightColor((boolean) viewConfig.get("lightColor"));
         }
         /// 设置导航栏颜⾊
-        if(dataStatus( viewConfig, "navColor")){
+        if (dataStatus(viewConfig, "navColor")) {
             config.setNavColor(Color.parseColor((String) viewConfig.get("navColor")));
         }
         /// 设置导航栏标题⽂字
-        if(dataStatus( viewConfig, "navText")){
+        if (dataStatus(viewConfig, "navText")) {
             config.setNavText((String) viewConfig.get("navText"));
         }
         /// 设置导航栏标题⽂字颜⾊
-        if(dataStatus( viewConfig, "navTextColor")){
+        if (dataStatus(viewConfig, "navTextColor")) {
             config.setNavTextColor(Color.parseColor((String) viewConfig.get("navTextColor")));
         }
         /// 设置导航栏标题⽂字⼤⼩
-        if(dataStatus( viewConfig, "navTextSize")){
+        if (dataStatus(viewConfig, "navTextSize")) {
             config.setNavTextSize((int) viewConfig.get("navTextSize"));
         }
         /// 设置导航栏返回键图⽚
-        if(dataStatus( viewConfig, "navReturnImgPath")){
+        if (dataStatus(viewConfig, "navReturnImgPath")) {
             config.setNavReturnImgPath((String) viewConfig.get("navReturnImgPath"));
         }
 
         /// 设置导航栏返回键图⽚宽度
-        if(dataStatus( viewConfig, "navReturnImgWidth")){
+        if (dataStatus(viewConfig, "navReturnImgWidth")) {
             config.setNavReturnImgWidth((int) viewConfig.get("navReturnImgWidth"));
         }
 
         /// 设置导航栏返回键图⽚高度
-        if(dataStatus( viewConfig, "navReturnImgHeight")){
+        if (dataStatus(viewConfig, "navReturnImgHeight")) {
             config.setNavReturnScaleType(ImageView.ScaleType.CENTER);
             config.setNavReturnImgHeight((int) viewConfig.get("navReturnImgHeight"));
         }
 
         /// 设置导航栏返回按钮隐藏
-        if(dataStatus( viewConfig, "navReturnHidden")){
+        if (dataStatus(viewConfig, "navReturnHidden")) {
             config.setNavReturnHidden((boolean) viewConfig.get("navReturnHidden"));
         }
         /// 设置默认导航栏是否隐藏
-        if(dataStatus( viewConfig, "navHidden")){
+        if (dataStatus(viewConfig, "navHidden")) {
             config.setNavHidden((boolean) viewConfig.get("navHidden"));
         }
         /// 设置状态栏是否隐藏
-        if(dataStatus( viewConfig, "statusBarHidden")){
+        if (dataStatus(viewConfig, "statusBarHidden")) {
             config.setStatusBarHidden((boolean) viewConfig.get("statusBarHidden"));
         }
         /// 设置状态栏UI属性 View.SYSTEM_UI_FLAG_LOW_PROFILE View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        if(dataStatus( viewConfig, "statusBarUIFlag")){
+        if (dataStatus(viewConfig, "statusBarUIFlag")) {
             config.setStatusBarUIFlag((int) viewConfig.get("statusBarUIFlag"));
         }
         /// 设置协议⻚状态栏颜⾊（系统版本 5.0 以上可设置）不设置则与授权⻚设置⼀致
-        if(dataStatus( viewConfig, "webViewStatusBarColor")){
+        if (dataStatus(viewConfig, "webViewStatusBarColor")) {
             config.setWebViewStatusBarColor(Color.parseColor((String) viewConfig.get("webViewStatusBarColor")));
         }
         /// 设置协议⻚顶部导航栏背景⾊不设置则与授权⻚设置⼀致
-        if(dataStatus( viewConfig, "webNavColor")){
+        if (dataStatus(viewConfig, "webNavColor")) {
             config.setWebNavColor(Color.parseColor((String) viewConfig.get("webNavColor")));
         }
         /// 设置协议⻚顶部导航栏标题颜⾊不设置则与授权⻚设置⼀致
-        if(dataStatus( viewConfig, "webNavTextColor")){
+        if (dataStatus(viewConfig, "webNavTextColor")) {
             config.setWebNavTextColor(Color.parseColor((String) viewConfig.get("webNavTextColor")));
         }
         /// 设置协议⻚顶部导航栏⽂字⼤⼩22不设置则与授权⻚设置⼀致
-        if(dataStatus( viewConfig, "webNavTextSize")){
+        if (dataStatus(viewConfig, "webNavTextSize")) {
             config.setWebNavTextSize((int) viewConfig.get("webNavTextSize"));
         }
         /// 设置协议⻚导航栏返回按钮图⽚路径不设置则与授权⻚设置⼀致
-        if(dataStatus( viewConfig, "webNavReturnImgPath")){
+        if (dataStatus(viewConfig, "webNavReturnImgPath")) {
             config.setWebNavReturnImgPath((String) viewConfig.get("webNavReturnImgPath"));
         }
         /// 设置底部虚拟按键背景⾊（系统版本 5.0 以上可设置）
-        if(dataStatus( viewConfig, "bottomNavColor")){
+        if (dataStatus(viewConfig, "bottomNavColor")) {
             config.setBottomNavColor(Color.parseColor((String) viewConfig.get("bottomNavColor")));
         }
         /// 隐藏logo
-        if(dataStatus( viewConfig, "logoHidden")){
-            config.setLogoHidden((boolean) viewConfig.get("logoHidden"));
-        }
+
+        config.setLogoHidden(false);
         /// 设置logo 图⽚
-        if(dataStatus( viewConfig, "logoImgPath")){
-            config.setLogoImgPath((String) viewConfig.get("logoImgPath"));
-        }
+
+//        if(dataStatus( viewConfig, "logoImgPath")){
+        config.setLogoImgPath("loginimg.png");
+//        }
         /// 设置logo 控件宽度
-        if(dataStatus( viewConfig, "logoWidth")){
-            config.setLogoWidth((int) viewConfig.get("logoWidth"));
-        }
+//        if(dataStatus( viewConfig, "logoWidth")){
+//            config.setLogoWidth((int) viewConfig.get("logoWidth"));
+//        }
         /// 设置logo 控件⾼度
-        if(dataStatus( viewConfig, "logoHeight")){
-            config.setLogoHeight((int) viewConfig.get("logoHeight"));
-        }
+//        if(dataStatus( viewConfig, "logoHeight")){
+        config.setLogoHeight(200);
+        config.setLogoWidth(200);
+//        }
         /// 设置logo 控件相对导航栏顶部的位移，单位dp
-        if(dataStatus( viewConfig, "logoOffsetY")){
+        if (dataStatus(viewConfig, "logoOffsetY")) {
             config.setLogoOffsetY((int) viewConfig.get("logoOffsetY"));
         }
         /// 设置logo图⽚缩放模式 ImageView.ScaleType
-        if(dataStatus( viewConfig, "logoScaleType")){
+        if (dataStatus(viewConfig, "logoScaleType")) {
             config.setLogoScaleType(ImageView.ScaleType.valueOf((String) viewConfig.get("logoScaleType")));
         }
         /// 隐藏slogan
-        if(dataStatus( viewConfig, "sloganHidden")){
-            config.setSloganHidden((boolean) viewConfig.get("sloganHidden"));
-        }
+        config.setSloganHidden(true);
         /// 设置slogan ⽂字内容
-        if(dataStatus( viewConfig, "sloganText")){
-            config.setSloganText((String) viewConfig.get("sloganText"));
-        }
+//        if(dataStatus( viewConfig, "sloganText")){
+//            config.setSloganText((String) viewConfig.get("sloganText"));
+//        }
         /// 设置slogan ⽂字颜⾊
-        if(dataStatus( viewConfig, "sloganTextColor")){
-            config.setSloganTextColor(Color.parseColor((String) viewConfig.get("sloganTextColor")));
-        }
+//        if(dataStatus( viewConfig, "sloganTextColor")){
+//            config.setSloganTextColor(Color.parseColor((String) viewConfig.get("sloganTextColor")));
+//        }
         /// 设置slogan ⽂字⼤⼩
-        if(dataStatus( viewConfig, "sloganTextSize")){
-            config.setSloganTextSize((int) viewConfig.get("sloganTextSize"));
-        }
+//        if(dataStatus( viewConfig, "sloganTextSize")){
+//            config.setSloganTextSize((int) viewConfig.get("sloganTextSize"));
+//        }
         /// 设置slogan 相对导航栏顶部的 位移，单位dp
-        if(dataStatus( viewConfig, "sloganOffsetY")){
-            config.setSloganOffsetY((int) viewConfig.get("sloganOffsetY"));
-        }
+//        if(dataStatus( viewConfig, "sloganOffsetY")){
+//            config.setSloganOffsetY((int) viewConfig.get("sloganOffsetY"));
+//        }
         /// 设置⼿机号码字体颜⾊
-        if(dataStatus( viewConfig, "numberColor")){
+        if (dataStatus(viewConfig, "numberColor")) {
             config.setNumberColor(Color.parseColor((String) viewConfig.get("numberColor")));
         }
         /// 设置⼿机号码字体⼤⼩
-        if(dataStatus( viewConfig, "numberSize")){
+        if (dataStatus(viewConfig, "numberSize")) {
             config.setNumberSize((int) viewConfig.get("numberSize"));
         }
         /// 设置号码栏控件相对导航栏顶部的位移，单位 dp
-        if(dataStatus( viewConfig, "numFieldOffsetY")){
+        if (dataStatus(viewConfig, "numFieldOffsetY")) {
             config.setNumFieldOffsetY((int) viewConfig.get("numFieldOffsetY"));
         }
         /// 设置号码栏相对于默认位置的X轴偏移量，单位dp
-        if(dataStatus( viewConfig, "numberFieldOffsetX")){
+        if (dataStatus(viewConfig, "numberFieldOffsetX")) {
             config.setNumberFieldOffsetX((int) viewConfig.get("numberFieldOffsetX"));
         }
         /// 设置⼿机号掩码的布局对⻬⽅式，只⽀持Gravity.CENTER_HORIZONTAL、Gravity.LEFT、Gravity.RIGHT三种对⻬⽅式
-        if(dataStatus( viewConfig, "numberLayoutGravity")){
+        if (dataStatus(viewConfig, "numberLayoutGravity")) {
             config.setNumberLayoutGravity((int) viewConfig.get("numberLayoutGravity"));
         }
         /// 设置登录按钮⽂字
-        if(dataStatus( viewConfig, "logBtnText")){
+        if (dataStatus(viewConfig, "logBtnText")) {
             config.setLogBtnText((String) viewConfig.get("logBtnText"));
         }
         /// 设置登录按钮⽂字颜⾊
-        if(dataStatus( viewConfig, "logBtnTextColor")){
+        if (dataStatus(viewConfig, "logBtnTextColor")) {
             config.setLogBtnTextColor(Color.parseColor((String) viewConfig.get("logBtnTextColor")));
         }
         /// 设置登录按钮⽂字⼤⼩
-        if(dataStatus( viewConfig, "logBtnTextSize")){
+        if (dataStatus(viewConfig, "logBtnTextSize")) {
             config.setLogBtnTextSize((int) viewConfig.get("logBtnTextSize"));
         }
         /// 设置登录按钮宽度，单位 dp
-        if(dataStatus( viewConfig, "logBtnWidth")){
+        if (dataStatus(viewConfig, "logBtnWidth")) {
             config.setLogBtnWidth((int) viewConfig.get("logBtnWidth"));
         }
         /// 设置登录按钮⾼度，单位dp
-        if(dataStatus( viewConfig, "logBtnHeight")){
+        if (dataStatus(viewConfig, "logBtnHeight")) {
             config.setLogBtnHeight((int) viewConfig.get("logBtnHeight"));
         }
         /// 设置登录按钮相对于屏幕左右边缘边距
-        if(dataStatus( viewConfig, "logBtnMarginLeftAndRight")){
+        if (dataStatus(viewConfig, "logBtnMarginLeftAndRight")) {
             config.setLogBtnMarginLeftAndRight((int) viewConfig.get("logBtnMarginLeftAndRight"));
         }
         /// 设置登录按钮背景图⽚路径
-        if(dataStatus( viewConfig, "logBtnBackgroundPath")){
+        if (dataStatus(viewConfig, "logBtnBackgroundPath")) {
             config.setLogBtnBackgroundPath((String) viewConfig.get("logBtnBackgroundPath"));
         }
         /// 设置登录按钮相对导航栏顶部的位移，单位 dp
-        if(dataStatus( viewConfig, "logBtnOffsetY")){
+        if (dataStatus(viewConfig, "logBtnOffsetY")) {
             config.setLogBtnOffsetY((int) viewConfig.get("logBtnOffsetY"));
         }
         /// 设置登录loading dialog 背景图⽚路径24
-        if(dataStatus( viewConfig, "loadingImgPath")){
+        if (dataStatus(viewConfig, "loadingImgPath")) {
             config.setLoadingImgPath((String) viewConfig.get("loadingImgPath"));
         }
         /// 设置登陆按钮X轴偏移量，如果设置了setLogBtnMarginLeftAndRight，并且布局对⻬⽅式为左对⻬或者右对⻬,则会在margin的基础上再增加offsetX的偏移量，如果是居中对⻬，则仅仅会在居中的基础上再做offsetX的偏移。
-        if(dataStatus( viewConfig, "logBtnOffsetX")){
+        if (dataStatus(viewConfig, "logBtnOffsetX")) {
             config.setLogBtnOffsetX((int) viewConfig.get("logBtnOffsetX"));
         }
         /// 设置登陆按钮布局对⻬⽅式，只⽀持Gravity.CENTER_HORIZONTAL、Gravity.LEFT、Gravity.RIGHT三种对⻬⽅式
-        if(dataStatus( viewConfig, "logBtnLayoutGravity")){
+        if (dataStatus(viewConfig, "logBtnLayoutGravity")) {
             config.setLogBtnLayoutGravity((int) viewConfig.get("logBtnLayoutGravity"));
         }
         /// 设置开发者隐私条款 1 名称和URL(名称，url) String,String
-        if(dataStatus( viewConfig, "appPrivacyOne")){
+        if (dataStatus(viewConfig, "appPrivacyOne")) {
             String[] appPrivacyOne = ((String) viewConfig.get("appPrivacyOne")).split(",");
             config.setAppPrivacyOne(appPrivacyOne[0], appPrivacyOne[1]);
         }
         /// 设置开发者隐私条款 2 名称和URL(名称，url) String,String
-        if(dataStatus( viewConfig, "appPrivacyTwo")){
+        if (dataStatus(viewConfig, "appPrivacyTwo")) {
             String[] appPrivacyTwo = ((String) viewConfig.get("appPrivacyTwo")).split(",");
             config.setAppPrivacyTwo(appPrivacyTwo[0], appPrivacyTwo[1]);
         }
         /// 设置隐私条款名称颜⾊(基础⽂字颜⾊，协议⽂字颜⾊)
-        if(dataStatus( viewConfig, "appPrivacyColor")){
+        if (dataStatus(viewConfig, "appPrivacyColor")) {
             String[] appPrivacyColor = ((String) viewConfig.get("appPrivacyColor")).split(",");
             config.setAppPrivacyColor(Color.parseColor(appPrivacyColor[0]), Color.parseColor(appPrivacyColor[1]));
         }
         /// 设置隐私条款相对导航栏顶部的位移，单位dp
-        if(dataStatus( viewConfig, "privacyOffsetY")){
+        if (dataStatus(viewConfig, "privacyOffsetY")) {
             config.setPrivacyOffsetY((int) viewConfig.get("privacyOffsetY"));
         }
         /// 设置隐私条款是否默认勾选
-        if(dataStatus( viewConfig, "privacyState")){
+        if (dataStatus(viewConfig, "privacyState")) {
             config.setPrivacyState((boolean) viewConfig.get("privacyState"));
         }
         /// 设置隐私条款⽂字对⻬⽅式，单位Gravity.xxx
-        if(dataStatus( viewConfig, "protocolGravity")){
+        if (dataStatus(viewConfig, "protocolGravity")) {
             config.setProtocolGravity((int) viewConfig.get("protocolGravity"));
         }
         /// 设置隐私条款⽂字⼤⼩，单位sp
-        if(dataStatus( viewConfig, "privacyTextSize")){
+        if (dataStatus(viewConfig, "privacyTextSize")) {
             config.setPrivacyTextSize((int) viewConfig.get("privacyTextSize"));
         }
         /// 设置隐私条款距离⼿机左右边缘的边距，单位dp
-        if(dataStatus( viewConfig, "privacyMargin")){
+        if (dataStatus(viewConfig, "privacyMargin")) {
             config.setPrivacyMargin((int) viewConfig.get("privacyMargin"));
         }
         /// 设置开发者隐私条款前置⾃定义25⽂案
-        if(dataStatus( viewConfig, "privacyBefore")){
+        if (dataStatus(viewConfig, "privacyBefore")) {
             config.setPrivacyBefore((String) viewConfig.get("privacyBefore"));
         }
         /// 设置开发者隐私条款尾部⾃定义⽂案
-        if(dataStatus( viewConfig, "privacyEnd")){
+        if (dataStatus(viewConfig, "privacyEnd")) {
             config.setPrivacyEnd((String) viewConfig.get("privacyEnd"));
         }
         /// 设置复选框是否隐藏
-        if(dataStatus( viewConfig, "checkboxHidden")){
+        if (dataStatus(viewConfig, "checkboxHidden")) {
             config.setCheckboxHidden((boolean) viewConfig.get("checkboxHidden"));
         }
         /// 设置复选框未选中时图⽚
-        if(dataStatus( viewConfig, "uncheckedImgPath")){
+        if (dataStatus(viewConfig, "uncheckedImgPath")) {
             config.setUncheckedImgPath((String) viewConfig.get("uncheckedImgPath"));
         }
         /// 设置复选框选中时图⽚
-        if(dataStatus( viewConfig, "checkedImgPath")){
+        if (dataStatus(viewConfig, "checkedImgPath")) {
             config.setCheckedImgPath((String) viewConfig.get("checkedImgPath"));
         }
         /// 设置运营商协议前缀符号，只能设置⼀个字符，且只能设置<>()《》【】『』[]（）中的⼀个
-        if(dataStatus( viewConfig, "vendorPrivacyPrefix")){
+        if (dataStatus(viewConfig, "vendorPrivacyPrefix")) {
             config.setVendorPrivacyPrefix((String) viewConfig.get("vendorPrivacyPrefix"));
         }
         /// 设置运营商协议后缀符号，只能设置⼀个字符，且只能设置<>()《》【】『』[]（）中的⼀个
-        if(dataStatus( viewConfig, "vendorPrivacySuffix")){
+        if (dataStatus(viewConfig, "vendorPrivacySuffix")) {
             config.setVendorPrivacySuffix((String) viewConfig.get("vendorPrivacySuffix"));
         }
         /// 设置隐私栏的布局对⻬⽅式，该接⼝控制了整个隐私栏（包含checkbox）在其⽗布局中的对⻬⽅式，⽽setProtocolGravity控制的是隐私协议⽂字内容在⽂本框中的对⻬⽅式
-        if(dataStatus( viewConfig, "protocolLayoutGravity")){
+        if (dataStatus(viewConfig, "protocolLayoutGravity")) {
             config.setProtocolLayoutGravity((int) viewConfig.get("protocolLayoutGravity"));
         }
         /// 设置隐私栏X轴偏移量，单位dp
-        if(dataStatus( viewConfig, "privacyOffsetX")){
+        if (dataStatus(viewConfig, "privacyOffsetX")) {
             config.setPrivacyOffsetX((int) viewConfig.get("privacyOffsetX"));
         }
         /// 设置checkbox未勾选时，点击登录按钮toast是否显示
-        if(dataStatus( viewConfig, "logBtnToastHidden")){
+        if (dataStatus(viewConfig, "logBtnToastHidden")) {
             config.setLogBtnToastHidden((boolean) viewConfig.get("logBtnToastHidden"));
         }
         /// 设置授权⻚进场动画
-        if(dataStatus( viewConfig, "authPageActIn")){
+        if (dataStatus(viewConfig, "authPageActIn")) {
             String[] authPageActIn = ((String) viewConfig.get("authPageActIn")).split(",");
-            config.setAuthPageActIn(authPageActIn[0], authPageActIn[1]);
+//            config.setAuthPageActIn(authPageActIn[0], authPageActIn[1]);
         }
         /// 设置授权⻚退出动画
-        if(dataStatus( viewConfig, "authPageActOut")){
+        if (dataStatus(viewConfig, "authPageActOut")) {
             String[] authPageActOut = ((String) viewConfig.get("authPageActOut")).split(",");
             config.setAuthPageActOut(authPageActOut[0], authPageActOut[1]);
         }
         /// 设置授权⻚背景图drawable资源的⽬录，不需要加后缀，⽐如图⽚在drawable中的存放⽬录是res/drawablexxhdpi/loading.png,则传⼊参数为"loading"，setPageBackgroundPath("loading")。
-        if(dataStatus( viewConfig, "pageBackgroundPath")){
+        if (dataStatus(viewConfig, "pageBackgroundPath")) {
             config.setPageBackgroundPath((String) viewConfig.get("pageBackgroundPath"));
         }
 
         /// 设置切换按钮点是否可⻅
-        if(dataStatus( viewConfig, "switchAccHidden")){
+        if (dataStatus(viewConfig, "switchAccHidden")) {
             config.setSwitchAccHidden((boolean) viewConfig.get("switchAccHidden"));
         }
 
         /// 设置切换按钮⽂字内容
-        if(dataStatus( viewConfig, "switchAccText")){
+        if (dataStatus(viewConfig, "switchAccText")) {
             config.setSwitchAccText((String) viewConfig.get("switchAccText"));
         }
 
         /// 设置切换按钮⽂字颜⾊
-        if(dataStatus( viewConfig, "switchAccTextColor")){
+        if (dataStatus(viewConfig, "switchAccTextColor")) {
             config.setSwitchAccTextColor(Color.parseColor((String) viewConfig.get("switchAccTextColor")));
         }
 
         /// 设置切换按钮⽂字⼤⼩
-        if(dataStatus( viewConfig, "switchAccTextSize")){
+        if (dataStatus(viewConfig, "switchAccTextSize")) {
             config.setSwitchAccTextSize((int) viewConfig.get("switchAccTextSize"));
         }
 
         /// 设置换按钮相对导航栏顶部的位移，单位 dp
-        if(dataStatus( viewConfig, "switchOffsetY")){
+        if (dataStatus(viewConfig, "switchOffsetY")) {
             config.setSwitchOffsetY((int) viewConfig.get("switchOffsetY"));
         }
 
         /// 是dislog的配置
-        if(dataStatus( viewConfig, "isDialog")){
+        if (dataStatus(viewConfig, "isDialog")) {
             /// 设置换按钮相对导航栏顶部的位移，单位 dp
-            if(dataStatus( viewConfig, "dialogAlpha")){
+            if (dataStatus(viewConfig, "dialogAlpha")) {
                 config.setDialogAlpha(Float.parseFloat(String.valueOf((double) viewConfig.get("dialogAlpha"))));
             }
 
             /// 设置弹窗模式授权⻚X轴偏移, 单位dp
-            if(dataStatus( viewConfig, "dialogOffsetX")){
+            if (dataStatus(viewConfig, "dialogOffsetX")) {
                 config.setDialogOffsetX((int) viewConfig.get("dialogOffsetX"));
             }
 
             /// 设置弹窗模式授权⻚Y轴偏移, 单位dp
-            if(dataStatus( viewConfig, "dialogOffsetY")){
+            if (dataStatus(viewConfig, "dialogOffsetY")) {
                 config.setDialogOffsetY((int) viewConfig.get("dialogOffsetY"));
             }
 
             /// 设置授权⻚是否居于底部
-            if(dataStatus( viewConfig, "dialogBottom")){
+            if (dataStatus(viewConfig, "dialogBottom")) {
                 config.setDialogBottom((boolean) viewConfig.get("dialogBottom"));
             }
         }
-
-        mAlicomAuthHelper.setAuthUIConfig(config.create());
+        Log.e(TAG, "configBuilder:" + config.toString());
+//        mAlicomAuthHelper.setAuthUIConfig(config.create());
     }
 
     /// 获取key

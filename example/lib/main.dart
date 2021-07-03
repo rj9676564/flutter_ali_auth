@@ -15,7 +15,7 @@ void main() {
   /// 详情请点击进入查看具体配置
   if (Platform.isAndroid) {
     AliAuthPlugin.initSdk(
-      sk: 'uYhNaUWEW+1rV9cq27oAQVWi8qFaF1wKfHr6BjrdnMoyQbtAxIA7q/ToLl1xKGCAwDl66Mii6KXK3FstD+PNcwS0aFCLorOrYHMHed8FX7AT8qu/AlzTXE05g0FmUMb5z1QKCiyvpmP+THs04fCfVtHsYdirkJGcd58r24o3QykIatcZYgd1jB3WAz3HLUqCg4afUK49SggbPdwscSfVV8wcB/hP+ST9kUVD02JmsqLA4YZUCRuUX2+o5AG1UpJwi/OHEccrFyEwuODaFzDSMPVth2pTZEwCB/g3PeLWhUQlWxvRqolgWQ==',
+      sk: 'sEVsVZ8CktqNCF7jINJYgOtqOt5s7nvVyFdTecBAqlrWeX04BJyszV0rIGKEFyO8Rs5SRBjoYhCJtQZSaNFVsDZhQWGqP3tThoJasRk/+Eub2P6hQs7P7fjl3yfIxTgWLPbTN8sY8tnNan46qI2Rzg9LD7Yr+v5Nt12or5n2VNeQpAAsa9Z/taEMjz5Xithh5DkQGbIIpsCfG3EaseWnXJF+HPZ0J0kO6G7iXTuVNqNBcbtxhtkRO8bZB0tyPzJIl7idMWg+rdLA+z37RPlnVjJSpyZHakWPkwG47hNLaBvodczLWaoE6cVEyBuxIGlBnIbdTqG4/Sw=',
       config: getConfig(),
     );
   } else {
@@ -62,7 +62,7 @@ class _MyAppState extends State<MyApp> {
 
   /// 登录成功处理
   void _onEvent(event) async {
-    print("-------------成功分割线------------$event");
+    print("-------------成功分割线-111-----------$event");
     if (event != null && event['code'] != null) {
       if (event['code'] == '600024') {
         await AliAuthPlugin.login;
@@ -80,6 +80,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      color: Colors.white,
       theme: ThemeData(
         brightness: Brightness.light,
       ),

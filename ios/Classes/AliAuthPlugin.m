@@ -501,6 +501,7 @@ bool bool_false = false;
       @"msg" : [showResult objectForKey:@"msg"]?:@"",
       @"data" : [showResult objectForKey:@"token"]?:@""
   };
+
   self->_eventSink(dict);
   [self showResultLog: showResult];
 }
@@ -519,17 +520,19 @@ bool bool_false = false;
             if ([showResult isKindOfClass:NSDictionary.class]) {
                 NSDictionary *dic = (NSDictionary*)showResult;
                 if([ @"700002" isEqualToString:dic[@"resultCode"]]){
+                    BOOL isChecked = [dic boolValueForKey:@"isChecked" defaultValue:NO];
+                    if(!isChecked){
+                        static MBProgressHUD *HUD = nil;
+                        UIView* navic =  [self viewControllerWithWindow:nil].view;
+                        HUD =   [MBProgressHUD showHUDAddedTo:navic animated:YES];
+                        HUD.label.text = @"请阅读并勾选用户协议及隐私协议";
+                        [HUD setMode:MBProgressHUDModeText];
                     
-                    static MBProgressHUD *HUD = nil;
-                
-                    //MBProgressHUD 默认字体颜色白色
-                    UIView* navic =  [self viewControllerWithWindow:nil].view;
-                   HUD =   [MBProgressHUD showHUDAddedTo:navic animated:YES];
-                    HUD.label.text = @"请阅读并勾选用户协议及隐私协议";
-                    [HUD setMode:MBProgressHUDModeText];
-                
-                    [HUD showAnimated:YES];
-                    [HUD hideAnimated:YES afterDelay:1.5];
+                        [HUD showAnimated:YES];
+                        [HUD hideAnimated:YES afterDelay:1.5];
+                    }
+//                    [1]    (null)    @"isChecked" : YES
+
                     
                 }
             }
