@@ -3,7 +3,7 @@
 #import <UIKit/UIKit.h>
 
 #import <ATAuthSDK/ATAuthSDK.h>
-#import "MBProgressHUD.h"
+//#import "ProgressHUD.h"
 #import "PNSBuildModelUtils.h"
 #import "NSDictionary+Utils.h"
 #import <AuthenticationServices/AuthenticationServices.h>
@@ -125,7 +125,78 @@ bool bool_false = false;
       self->_eventSink(dict);
       return;
     }
-    [self loginWithModel: _model complete:^{}];
+      TXCustomModel *model = [PNSBuildModelUtils buildFullScreenModel];
+        model.supportedInterfaceOrientations = UIInterfaceOrientationMaskPortrait;
+        NSLog(@"%@",model);
+        NSLog(@"%@",_model);
+          model.navColor = UIColor.whiteColor;
+          model.navBackImage = [UIImage imageNamed:@"icon_nav_back_gray"];
+          model.navTitle =[[NSAttributedString alloc] initWithString:@"一键登录"];
+          model.logoImage = [UIImage imageNamed:@"logo.png"];
+          model.alertBlurViewColor = UIColor.grayColor;
+          model.privacyNavColor = UIColor.whiteColor;
+          model.privacyColors=@[UIColor.grayColor,UIColor.orangeColor];
+          model.privacyOperatorPreText = @"《";
+          model.privacyOperatorSufText = @"》";
+
+          model.checkBoxImages = @[[UIImage imageNamed:@"checkbox"],[UIImage imageNamed:@"gouxuan1"]];
+          model.checkBoxWH = 17;
+          model.checkBoxIsHidden = NO;
+          model.privacyOne = @[@"《用户服务协议》", @"https://nest-h5.juhesaas.com/pages_h5/user-policy/index"];
+          model.privacyNavBackImage = [UIImage imageNamed:@"icon_nav_back_gray.png"];
+          model.privacyTwo = @[@"《平台隐私政策》",@"https://nest-h5.juhesaas.com/pages_h5/privacy-policy/index"];
+          model.privacyNavTitleColor = UIColor.blackColor;
+          
+          model.logoFrameBlock =  ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
+              frame.size.width = 160;
+              frame.size.height = 160;
+              frame.origin.y = 15;
+              frame.origin.x = (superViewSize.width - 160) * 0.5;
+              return frame;
+          };
+      //    model.changeBtnIsHidden = YES;
+      //    model.checkBoxIsHidden = NO;
+          model.sloganIsHidden = YES;
+          model.numberColor=UIColor.blackColor;
+          model.numberFont = [UIFont systemFontOfSize:26 weight:600];
+          model.logoIsHidden =YES;
+      //    UIGestureRecognizer* wechatGR = [[UIGestureRecognizer alloc]initWithTarget:self action:@selector(closeClick:)];
+          __block UIView* wechatView = [self loginView:@"weixin.png" btnName:@"微信登录"];
+          [wechatView setTag:10000];
+          
+      //    [wechatView addGestureRecognizer:wechatGR];
+          __block UIView* checkCodeView = [self loginView:@"duanxinyanzhengma.png" btnName:@"验证码登录"];
+          [checkCodeView setTag:10001];
+      //    [checkCodeView addGestureRecognizer:wechatGR];
+          __block UIView* pwdView = [self loginView:@"zhanghaomima.png" btnName:@"密码登录"];
+          [pwdView setTag:10002];
+      //    [pwdView addGestureRecognizer:wechatGR];
+          
+           model.customViewBlock = ^(UIView * _Nonnull superCustomView) {
+              [superCustomView addSubview:wechatView];
+              [superCustomView addSubview:checkCodeView];
+              [superCustomView addSubview:pwdView];
+           };
+           model.customViewLayoutBlock = ^(CGSize screenSize, CGRect contentViewFrame, CGRect navFrame, CGRect titleBarFrame, CGRect logoFrame, CGRect sloganFrame, CGRect numberFrame, CGRect loginFrame, CGRect changeBtnFrame, CGRect privacyFrame) {
+               CGRect checkCodeframe = checkCodeView.frame;
+               checkCodeframe.origin.x = (contentViewFrame.size.width - checkCodeframe.size.width) * 0.5;
+               checkCodeframe.origin.y = CGRectGetMinY(privacyFrame) - checkCodeframe.size.height - 20;
+               checkCodeView.frame = checkCodeframe;
+               
+               CGRect frame = wechatView.frame;
+               frame.origin.x = (contentViewFrame.size.width - frame.size.width) * 0.5-100;
+               frame.origin.y = CGRectGetMinY(privacyFrame) - frame.size.height - 20;
+               wechatView.frame = frame;
+               
+               
+       
+               CGRect pwdframe = pwdView.frame;
+               pwdframe.origin.x = (contentViewFrame.size.width - frame.size.width) * 0.5+100;
+               pwdframe.origin.y = CGRectGetMinY(privacyFrame) - pwdframe.size.height - 20;
+      //         pwdframe.size.width = 100;
+               pwdView.frame = pwdframe;
+           };
+    [self loginWithModel: model complete:^{}];
   }
   else  if ([@"preLogin" isEqualToString:call.method]) {
     [self getPreLogin:call result:result];
@@ -138,6 +209,46 @@ bool bool_false = false;
   }
 }
 
+-(UIView*)loginView:(NSString*)iconName btnName:(NSString*)btnMame{
+    // 创建一个手势对象
+    
+    UIButton* btnView = [[UIButton alloc] init];
+    btnView.frame = CGRectMake(0, 0, 100, 78);
+    
+    UIImageView* iconView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:iconName]];
+    iconView.frame = CGRectMake(0, 0, 100, 48);
+    [iconView setContentMode:UIViewContentModeScaleAspectFit];
+    [btnView addSubview:iconView];
+    
+    UILabel* lableView = [[UILabel alloc] initWithFrame:CGRectMake(0, 58, 100, 20)];
+//    [lableView setText:btnMame];
+//    lableView.textAlignment = NSTextAlignmentCenter;
+    [lableView setFont:[UIFont systemFontOfSize:14]];
+    
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:btnMame];
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    // 设置文字居中
+    paragraphStyle.alignment = NSTextAlignmentCenter;
+    [paragraphStyle setLineSpacing:12];
+
+    [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, [btnMame length])];
+    lableView.attributedText = attributedString;
+    
+    [btnView addSubview:lableView];
+    [btnView addTarget:self action:@selector(closeClick:) forControlEvents:UIControlEventTouchUpInside];
+    
+    return  btnView;
+//    [self.imgView addGestureRecognizer:tap];
+    
+}
+-(void)closeClick:(UIButton *)view{
+    NSDictionary *dict = @{@"msg": @"点击其它登录", @"resultCode": [NSString stringWithFormat:@"%ld",view.tag]};
+    [self showResult:dict];
+    UIViewController *_vc = [self findCurrentViewController];
+    [_vc dismissViewControllerAnimated:YES completion:^{
+        
+    }];
+}
 #pragma mark - 初始化SDK以及相关布局
 - (void)initSdk {
   NSDictionary *dic = _callData.arguments;
@@ -153,7 +264,6 @@ bool bool_false = false;
                                                target: self];
       _model.supportedInterfaceOrientations = UIInterfaceOrientationMaskPortrait;
     } else {
-        
       _model = [PNSBuildModelUtils buildNewFullScreenModel: config
                                                   selector: @selector(btnClick:)
                                                     target: self];
@@ -248,151 +358,6 @@ bool bool_false = false;
   }];
 }
 
-// 一键登录(全屏支持旋转)
-- (void)getLoginTokenFullAutorotate:(FlutterMethodCall*)call result:(FlutterResult)result {
-    TXCustomModel *model = [PNSBuildModelUtils buildFullScreenModel];
-    model.supportedInterfaceOrientations = UIInterfaceOrientationMaskAllButUpsideDown;
-    [self loginWithModel:model complete:^{}];
-}
-// 一键登录(弹窗支持旋转)
-- (void)getLoginTokenAlertAutorotate:(FlutterMethodCall*)call result:(FlutterResult)result {
-    TXCustomModel *model = [PNSBuildModelUtils buildAlertModel];
-    model.supportedInterfaceOrientations = UIInterfaceOrientationMaskAllButUpsideDown;
-    [self loginWithModel:model complete:^{}];
-}
-// 一键登录(竖屏全屏)
-- (void)getLoginTokenFullVertical:(FlutterMethodCall*)call result:(FlutterResult)result{
-  TXCustomModel *model = [PNSBuildModelUtils buildFullScreenModel];
-  model.supportedInterfaceOrientations = UIInterfaceOrientationMaskPortrait;
-  NSLog(@"%@",model);
-  NSLog(@"%@",_model);
-    model.navColor = UIColor.whiteColor;
-    model.navBackImage = [UIImage imageNamed:@"icon_nav_back_gray"];
-    model.navTitle =[[NSAttributedString alloc] initWithString:@"一键登录"];
-    model.logoImage = [UIImage imageNamed:@"logo.png"];
-    model.alertBlurViewColor = UIColor.grayColor;
-    model.privacyNavColor = UIColor.whiteColor;
-    model.privacyColors=@[UIColor.grayColor,UIColor.orangeColor];
-    model.privacyOperatorPreText = @"《";
-    model.privacyOperatorSufText = @"》";
-
-    model.checkBoxImages = @[[UIImage imageNamed:@"checkbox"],[UIImage imageNamed:@"gouxuan1"]];
-    model.checkBoxWH = 17;
-    model.checkBoxIsHidden = NO;
-    model.privacyOne = @[@"《用户服务协议》", @"https://nest-h5.juhesaas.com/pages_h5/user-policy/index"];
-    model.privacyNavBackImage = [UIImage imageNamed:@"icon_nav_back_gray.png"];
-    model.privacyTwo = @[@"《平台隐私政策》",@"https://nest-h5.juhesaas.com/pages_h5/privacy-policy/index"];
-    model.privacyNavTitleColor = UIColor.blackColor;
-    
-    model.logoFrameBlock =  ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
-        frame.size.width = 160;
-        frame.size.height = 160;
-        frame.origin.y = 15;
-        frame.origin.x = (superViewSize.width - 160) * 0.5;
-        return frame;
-    };
-//    model.changeBtnIsHidden = YES;
-//    model.checkBoxIsHidden = NO;
-    model.sloganIsHidden = YES;
-    model.numberColor=UIColor.blackColor;
-    model.numberFont = [UIFont systemFontOfSize:26 weight:600];
-    model.logoIsHidden =YES;
-//    UIGestureRecognizer* wechatGR = [[UIGestureRecognizer alloc]initWithTarget:self action:@selector(closeClick:)];
-    __block UIView* wechatView = [self loginView:@"weixin.png" btnName:@"微信登录"];
-    [wechatView setTag:10000];
-    
-//    [wechatView addGestureRecognizer:wechatGR];
-    __block UIView* checkCodeView = [self loginView:@"duanxinyanzhengma.png" btnName:@"验证码登录"];
-    [checkCodeView setTag:10001];
-//    [checkCodeView addGestureRecognizer:wechatGR];
-    __block UIView* pwdView = [self loginView:@"zhanghaomima.png" btnName:@"密码登录"];
-    [pwdView setTag:10002];
-//    [pwdView addGestureRecognizer:wechatGR];
-    
-     model.customViewBlock = ^(UIView * _Nonnull superCustomView) {
-        [superCustomView addSubview:wechatView];
-        [superCustomView addSubview:checkCodeView];
-        [superCustomView addSubview:pwdView];
-     };
-     model.customViewLayoutBlock = ^(CGSize screenSize, CGRect contentViewFrame, CGRect navFrame, CGRect titleBarFrame, CGRect logoFrame, CGRect sloganFrame, CGRect numberFrame, CGRect loginFrame, CGRect changeBtnFrame, CGRect privacyFrame) {
-         CGRect checkCodeframe = checkCodeView.frame;
-         checkCodeframe.origin.x = (contentViewFrame.size.width - checkCodeframe.size.width) * 0.5;
-         checkCodeframe.origin.y = CGRectGetMinY(privacyFrame) - checkCodeframe.size.height - 20;
-         checkCodeView.frame = checkCodeframe;
-         
-         CGRect frame = wechatView.frame;
-         frame.origin.x = (contentViewFrame.size.width - frame.size.width) * 0.5-100;
-         frame.origin.y = CGRectGetMinY(privacyFrame) - frame.size.height - 20;
-         wechatView.frame = frame;
-         
-         
- 
-         CGRect pwdframe = pwdView.frame;
-         pwdframe.origin.x = (contentViewFrame.size.width - frame.size.width) * 0.5+100;
-         pwdframe.origin.y = CGRectGetMinY(privacyFrame) - pwdframe.size.height - 20;
-//         pwdframe.size.width = 100;
-         pwdView.frame = pwdframe;
-     };
-  [self loginWithModel:model complete:^{}];
-}
--(UIView*)loginView:(NSString*)iconName btnName:(NSString*)btnMame{
-    // 创建一个手势对象
-    
-    UIButton* btnView = [[UIButton alloc] init];
-    btnView.frame = CGRectMake(0, 0, 100, 78);
-    
-    UIImageView* iconView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:iconName]];
-    iconView.frame = CGRectMake(0, 0, 100, 48);
-    [iconView setContentMode:UIViewContentModeScaleAspectFit];
-    [btnView addSubview:iconView];
-    
-    UILabel* lableView = [[UILabel alloc] initWithFrame:CGRectMake(0, 58, 100, 20)];
-//    [lableView setText:btnMame];
-//    lableView.textAlignment = NSTextAlignmentCenter;
-    [lableView setFont:[UIFont systemFontOfSize:14]];
-    
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:btnMame];
-    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-    // 设置文字居中
-    paragraphStyle.alignment = NSTextAlignmentCenter;
-    [paragraphStyle setLineSpacing:12];
-
-    [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, [btnMame length])];
-    lableView.attributedText = attributedString;
-    
-    [btnView addSubview:lableView];
-    [btnView addTarget:self action:@selector(closeClick:) forControlEvents:UIControlEventTouchUpInside];
-    
-    return  btnView;
-//    [self.imgView addGestureRecognizer:tap];
-    
-}
-
-
-- (UIViewController *)viewControllerWithWindow:(UIWindow *)window {
-  UIWindow *windowToUse = window;
-  if (windowToUse == nil) {
-      for (UIWindow *window in [UIApplication sharedApplication].windows) {
-          if (window.isKeyWindow) {
-              windowToUse = window;
-              break;
-          }
-      }
-  }
-
-  UIViewController *topController = windowToUse.rootViewController;
-  while (topController.presentedViewController) {
-      topController = topController.presentedViewController;
-  }
-  return topController;
-}
--(void)closeClick:(UIButton *)view{
-    NSDictionary *dict = @{@"msg": @"点击其它登录", @"resultCode": [NSString stringWithFormat:@"%ld",view.tag]};
-    [self showResult:dict];
-    [[self viewControllerWithWindow:nil] dismissViewControllerAnimated:YES completion:^{
-        
-    }];
-}
 // 一键登录预取号
 - (void)getPreLogin:(FlutterMethodCall*)call result:(FlutterResult)result{
     [self accelerateLogin:_model call:call result:result complete:^{}];
@@ -440,6 +405,7 @@ bool bool_false = false;
             [weakSelf showResult:resultDic];
             return;
         }
+        
         //2. 调用取号接口，加速授权页的弹起
         [[TXCommonHandler sharedInstance] accelerateLoginPageWithTimeout:timeout complete:^(NSDictionary * _Nonnull resultDic) {
             if ([PNSCodeSuccess isEqualToString:[resultDic objectForKey:@"resultCode"]] == NO) {
@@ -447,7 +413,6 @@ bool bool_false = false;
                 return ;
             }
             
-        
             //3. 调用获取登录Token接口，可以立马弹起授权页
             [[TXCommonHandler sharedInstance] getLoginTokenWithTimeout:timeout controller:_vc model:model complete:^(NSDictionary * _Nonnull resultDic) {
                 NSString *code = [resultDic objectForKey:@"resultCode"];
@@ -492,7 +457,6 @@ bool bool_false = false;
       @"msg" : [showResult objectForKey:@"msg"]?:@"",
       @"data" : [showResult objectForKey:@"token"]?:@""
   };
-
   self->_eventSink(dict);
   [self showResultLog: showResult];
 }
@@ -508,25 +472,7 @@ bool bool_false = false;
             // if (desc != nil) {
             //     desc = [NSString stringWithCString:[desc cStringUsingEncoding:NSUTF8StringEncoding] encoding:NSNonLossyASCIIStringEncoding];
             // }
-            if ([showResult isKindOfClass:NSDictionary.class]) {
-                NSDictionary *dic = (NSDictionary*)showResult;
-                if([ @"700002" isEqualToString:dic[@"resultCode"]]){
-                    BOOL isChecked = [dic boolValueForKey:@"isChecked" defaultValue:NO];
-                    if(!isChecked){
-                        static MBProgressHUD *HUD = nil;
-                        UIView* navic =  [self viewControllerWithWindow:nil].view;
-                        HUD =   [MBProgressHUD showHUDAddedTo:navic animated:YES];
-                        HUD.label.text = @"请阅读并勾选用户协议及隐私协议";
-                        [HUD setMode:MBProgressHUDModeText];
-                    
-                        [HUD showAnimated:YES];
-                        [HUD hideAnimated:YES afterDelay:1.5];
-                    }
-//                    [1]    (null)    @"isChecked" : YES
-
-                    
-                }
-            }
+            
         }
         // NSLog( @"打印日志---->>%@", desc );
     });
