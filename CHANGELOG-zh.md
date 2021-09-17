@@ -1,5 +1,27 @@
 #  
 
+## 0.1.7
+
+* 修复iOS没有图片路径报错
+* 修复iOS自定义返回按钮错误
+* 去除参数checkBoxImages 如需使用，请使用uncheckedImgPath，checkedImgPath参数代替
+* 更新android sdk 为2.12.1.4
+
+
+## 0.1.6
+
+* 修复changeBtnIsHidden改为changeBtnTitle
+
+## 0.1.5
+
+* 修复IOS端无按钮图片报错BUG
+* 修复IOS端图片不显示BUG
+
+## 0.1.4
+
+* 新增沉浸式布局时方案，自定义返回关闭按钮以及协议页面的处理
+* 更新iOS端SDK版本为2.12.1.3
+
 ## 0.1.3
 
 * 新增是否隐藏自定义布局
