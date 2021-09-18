@@ -32,6 +32,7 @@ rootProject.allprojects {
         jcenter()
         maven {
             url "https://d.mrlb.cc:8082/repository/3rd-release/"
+            }
         maven { // 添加这个指向本地的仓库目录
             url "file://$dir/libs"
         }
