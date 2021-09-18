@@ -384,8 +384,8 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
             authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_BEHIND;
         }
         mAlicomAuthHelper.setAuthUIConfig(new AuthUIConfig.Builder()
-                .setAppPrivacyOne("《自定义隐私协议》", "https://test.h5.app.tbmao.com/user")
-                .setAppPrivacyTwo("《百度》", "https://www.baidu.com")
+                .setAppPrivacyOne("《用户服务协议》", "https://nest-h5.juhesaas.com/pages_h5/privacy-policy/index")
+                .setAppPrivacyTwo("《平台隐私政策》", "https://nest-h5.juhesaas.com/pages_h5/privacy-policy/index")
                 .setAppPrivacyColor(Color.GRAY, Color.parseColor("#002E00"))
                 .setSwitchAccHidden(false)
                 .setPrivacyState(false)
@@ -397,7 +397,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 .setNavColor(Color.WHITE)
                 .setNavTextColor(Color.BLACK)
                 .setNavReturnImgPath("icon_nav_back_gray")
-                .setNavReturnHidden(false)
+                .setNavReturnHidden(true)
 //                .setStatusBarUIFlag(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
                 .setSloganHidden(true)
                 .setWebNavTextSizeDp(20)
@@ -412,12 +412,16 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 .setSwitchAccHidden(true)
 //                .setAuthPageActIn("in_activity", "out_activity")
 //                .setAuthPageActOut("in_activity", "out_activity")
-//                .setVendorPrivacyPrefix("《")
-//                .setVendorPrivacySuffix("》")
+                .setVendorPrivacyPrefix("《")
+                .setVendorPrivacySuffix("》")
 //                .setPageBackgroundPath("page_background_color")
 //                .setLogoImgPath("loginimg")
-//                .setLogBtnBackgroundPath("login_btn_bg")
+                .setLogBtnBackgroundPath("login_btn_bg")
 //                .setScreenOrientation(authPageOrientation)
+                .setWebNavColor(Color.WHITE)
+                .setWebViewStatusBarColor(Color.RED)
+                .setWebNavTextColor(Color.BLACK)
+                .setWebNavReturnImgPath("icon_nav_back_gray")
                 .create());
 
         initDynamicView(call);
@@ -1107,4 +1111,3 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     }
 
 }
-

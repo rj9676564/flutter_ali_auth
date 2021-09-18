@@ -1,3 +1,7 @@
+[![CircleCI](https://circleci.com/gh/CodeGather/flutter_ali_auth/tree/master.svg?style=svg)](https://circleci.com/gh/CodeGather/flutter_ali_auth/tree/master)
+![Ali_auth workflow](https://github.com/CodeGather/flutter_ali_auth/actions/workflows/actions_analysis.yml/badge.svg)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/8f5d7a0c1e5b4efebcd0502df53a61d0)](https://www.codacy.com/gh/CodeGather/flutter_ali_auth/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=CodeGather/flutter_ali_auth&amp;utm_campaign=Badge_Grade)
+
 # ali_auth
 
 [![GitHub license](https://img.shields.io/github/license/CodeGather/flutter_ali_auth?style=social)](https://github.com/CodeGather/flutter_ali_auth/blob/master/LICENSE)
@@ -6,6 +10,8 @@
 [![GitHub stars](https://img.shields.io/github/stars/CodeGather/flutter_ali_auth?style=social)](https://github.com/CodeGather/flutter_ali_auth/stargazers)
 [![GitHub size](https://img.shields.io/github/repo-size/CodeGather/flutter_ali_auth?style=social)](https://github.com/CodeGather/flutter_ali_auth)
 [![GitHub release](https://img.shields.io/github/v/release/CodeGather/flutter_ali_auth?style=social)](https://github.com/CodeGather/flutter_ali_auth/releases)
+[![GitHub dependency](https://img.shields.io/librariesio/github/CodeGather/flutter_ali_auth?style=social)](https://github.com/CodeGather/flutter_ali_auth)
+
 
 ## :large_blue_circle: Internationalization
 
@@ -57,3 +63,8 @@ However, when using or referring to the ideas or related contents of this plug-i
 - DEMO
   
 <img src="https://raw.githubusercontent.com/CodeGather/flutter_ali_auth/master/screenshot/WechatIMG7.jpeg" alt="android截图1" width="100"><img src="https://raw.githubusercontent.com/CodeGather/flutter_ali_auth/master/screenshot/WechatIMG6.jpeg" alt="android截图2" width="100"><img src="https://raw.githubusercontent.com/CodeGather/flutter_ali_auth/master/screenshot/WechatIMG5.jpeg" alt="android截图3" width="100"><img src="https://raw.githubusercontent.com/CodeGather/flutter_ali_auth/master/screenshot/IMG_4172.PNG" alt="ios截图1" width="100"><img src="https://raw.githubusercontent.com/CodeGather/flutter_ali_auth/master/screenshot/IMG_4173.PNG" alt="ios截图2" width="100"><img src="https://raw.githubusercontent.com/CodeGather/flutter_ali_auth/master/screenshot/IMG_4174.PNG" alt="ios截图3" width="100"><img src="https://raw.githubusercontent.com/CodeGather/flutter_ali_auth/master/screenshot/IMG_0456.PNG" alt="ios截图4" width="100"><img src="https://raw.githubusercontent.com/CodeGather/flutter_ali_auth/master/screenshot/IMG_0457.PNG" alt="ios截图5" width="100"><img src="https://raw.githubusercontent.com/CodeGather/flutter_ali_auth/master/screenshot/IMG_4228.PNG" alt="ios截图6" width="100">
+
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/CodeGather/flutter_ali_auth.svg)](https://starchart.cc/CodeGather/flutter_ali_auth)
+

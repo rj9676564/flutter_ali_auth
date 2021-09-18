@@ -1,5 +1,26 @@
 #  
 
+## 0.1.7
+
+* Fix IOS no picture path error
+* Fix IOS custom return button error
+* Remove the parameter checkboximages. If necessary, use uncheckedimgpath instead of checkedimgpath parameter
+* Update Android SDK to 2.12.1.4
+
+## 0.1.6
+
+* fix changeBtnIsHidden -> changeBtnTitle
+
+## 0.1.5
+
+* Fix the bug of no button image at IOS end
+* Fix that the IOS side image does not display a bug
+
+## 0.1.4
+
+* When adding an immersive layout scheme, customize the return close button and the processing of the protocol page
+* Update the IOS SDK version to 2.12.1.3
+
 ## 0.1.3
 
 * add isHiddenCustom
