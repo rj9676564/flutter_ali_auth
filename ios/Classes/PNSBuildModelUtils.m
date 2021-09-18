@@ -58,13 +58,13 @@
     model.privacyColors = @[UIColor.lightGrayColor, [self colorWithHex:0x3971fe alpha: 1]];
     model.privacyAlignment = NSTextAlignmentCenter;
     model.privacyFont = [UIFont fontWithName:@"PingFangSC-Regular" size:10.0];
-    model.privacyPreText = @"点击一键登录并登录表示您已阅读并同意";
+    model.privacyPreText = @"请同意并勾选用户协议及隐私政策";
     model.privacyOperatorPreText = @"《";
     model.privacyOperatorSufText = @"》";
     // 是否同意
     model.checkBoxIsHidden = NO;
     model.checkBoxImages = @[[UIImage imageNamed:@"checkbox"],[UIImage imageNamed:@"gouxuan1"]];
-    model.checkBoxWH = 17.0;
+    model.checkBoxWH = 30.0;
     // model.changeBtnTitle = [[NSAttributedString alloc] init];
     model.changeBtnTitle = [
        [NSAttributedString alloc] initWithString:@"   "
