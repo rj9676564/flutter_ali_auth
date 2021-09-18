@@ -9,6 +9,7 @@
 package com.jokui.rao.auth.ali_auth;
 
 import androidx.annotation.NonNull;
+
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -269,9 +270,12 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 jsonObject.put("code", code);
                 jsonObject.put("msg", "phone");
                 jsonObject.put("data", null);
-                if(code.equals("700002")){
-                    Toast.makeText(context, "请同意并勾选用户协议及隐私政策", Toast.LENGTH_SHORT).show();
-                    return;
+                if (jsonObj != null && jsonObj.contains("isChecked")) {
+                    JSONObject isCheck = JSONObject.parseObject(jsonObj);
+                    if (!isCheck.getBooleanValue("isChecked")) {
+                        Toast.makeText(context, "请同意并勾选用户协议及隐私政策", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                 }
                 //转化成json字符串
                 _events.success(jsonObject);
@@ -404,7 +408,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 .setNavColor(Color.WHITE)
                 .setNavTextColor(Color.BLACK)
                 .setNavReturnImgPath("icon_nav_back_gray")
-                .setNavReturnHidden(true)
+                .setNavReturnHidden(false)
 //                .setStatusBarUIFlag(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
                 .setSloganHidden(true)
                 .setWebNavTextSizeDp(20)
@@ -556,6 +560,19 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
             case "600026":
                 jsonObject.put("msg", "授权⻚已加载时不允许调⽤加速或预取号接⼝检查是否有授权⻚拉起后，去调⽤preLogin或者accelerateAuthPage的接⼝，该⾏为不允许");
                 break;
+            case "700000":
+                jsonObject.put("msg", "点击返回");
+                break;
+            case "700001":
+                jsonObject.put("msg", "用户切换其他登录方式");
+                break;
+            case "700002":
+                jsonObject.put("msg", "点击登录按钮");
+                break;
+            case "700003":
+                jsonObject.put("msg", "勾选协议选项");
+                jsonObject.put("data", tokenRet.getToken());
+                break;
             default:
                 break;
         }
@@ -611,7 +628,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
 
     // 自定义UI
     private void initDynamicView(MethodCall call) {
-        Log.e(TAG, "initDynamicView: " );
+        Log.e(TAG, "initDynamicView: ");
         Map viewConfig = (Map) call.argument("config");
 
 //        if (dataStatus( viewConfig, "isHiddenCustom")) {
