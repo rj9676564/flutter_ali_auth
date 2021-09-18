@@ -1,5 +1,5 @@
 group 'com.jokui.rao.auth.ali_auth'
-version '0.1.7'
+version '0.1.3'
 
 buildscript {
     repositories {
@@ -8,33 +8,16 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.android.tools.build:gradle:4.1.1'
     }
 }
 
-def getCurrentProjectDir() {
-    String result = ""
-    rootProject.allprojects { project ->
-        try {
-            if (project.properties.get("identityPath").toString() == ":ali_auth") {
-                result = project.properties.get("projectDir").toString()
-            }
-        }catch (e) {
-        }
-   }
-   return result
-}
-
 rootProject.allprojects {
-   def dir = getCurrentProjectDir()
     repositories {
         google()
         jcenter()
         maven {
             url "https://d.mrlb.cc:8082/repository/3rd-release/"
-            }
-        maven { // 添加这个指向本地的仓库目录
-            url "file://$dir/libs"
         }
     }
 }
@@ -58,14 +41,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.alibaba:fastjson:1.2.61'
     // 更换加载方式
-     implementation 'cc.mrlb:crashshield:2.0.3:release@aar'
-     implementation 'cc.mrlb:main:2.0.3:release@aar'
-     implementation 'cc.mrlb:logger:2.0.3:release@aar'
-     implementation 'cc.mrlb:phonenumber:2.0.3:release@aar'
+    implementation 'cc.mrlb:crashshield:2.0.3:release@aar'
+    implementation 'cc.mrlb:main:2.0.3:release@aar'
+    implementation 'cc.mrlb:logger:2.0.3:release@aar'
+    implementation 'cc.mrlb:phonenumber:2.0.3:release@aar'
     // implementation project(":libs")
-
-//    implementation "com.ali:phoneNumber-authSDK:2.12.1.3"
-//    implementation "com.ali:phoneNumber-logger:2.0.3"
-//    implementation "com.ali:phoneNumber-main:2.0.3"
-//    implementation "com.ali:phoneNumber-crashshield:2.0.3"
 }

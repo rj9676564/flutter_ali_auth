@@ -35,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -268,6 +269,10 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 jsonObject.put("code", code);
                 jsonObject.put("msg", "phone");
                 jsonObject.put("data", null);
+                if(code.equals("700002")){
+                    Toast.makeText(context, "请同意并勾选用户协议及隐私政策", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 //转化成json字符串
                 _events.success(jsonObject);
             }
@@ -310,7 +315,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     /**
      * SDK 判断网络环境是否支持
      */
-    public boolean checkVerifyEnable(MethodCall call, MethodChannel.Result result) {
+    public boolean checkVerifyEnable(MethodCall call, Result result) {
         // 判断网络是否支持
         boolean checkRet = mAlicomAuthHelper.checkEnvAvailable();
         if (!checkRet) {
@@ -324,7 +329,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     /**
      * SDK设置debug模式
      */
-    public void setDebugMode(MethodCall call, MethodChannel.Result result) {
+    public void setDebugMode(MethodCall call, Result result) {
         Object enable = getValueByKey(call, "debug");
         if (enable != null) {
             mAlicomAuthHelper.getReporter().setLoggerEnable((Boolean) enable);
@@ -338,7 +343,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     /**
      * SDK 一键登录预取号
      */
-    public void preLogin(MethodCall call, final MethodChannel.Result result) {
+    public void preLogin(MethodCall call, final Result result) {
         int timeOut = 5000;
         if (call.hasArgument("timeOut")) {
             Integer value = call.argument("timeOut");
@@ -377,7 +382,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     }
 
     // 正常登录
-    public void login(final MethodCall call, final MethodChannel.Result methodResult) {
+    public void login(final MethodCall call, final Result methodResult) {
 
         int authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
         if (Build.VERSION.SDK_INT == 26) {
@@ -386,8 +391,10 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         mAlicomAuthHelper.setAuthUIConfig(new AuthUIConfig.Builder()
                 .setAppPrivacyOne("《用户服务协议》", "https://nest-h5.juhesaas.com/pages_h5/privacy-policy/index")
                 .setAppPrivacyTwo("《平台隐私政策》", "https://nest-h5.juhesaas.com/pages_h5/privacy-policy/index")
+                .setNavText("")
                 .setAppPrivacyColor(Color.GRAY, Color.parseColor("#002E00"))
                 .setSwitchAccHidden(false)
+                .setLogBtnToastHidden(true)
                 .setPrivacyState(false)
                 .setCheckboxHidden(false)
                 .setLightColor(true)
@@ -404,7 +411,6 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 .setNumberSizeDp(30)
                 .setNumFieldOffsetY(230)
                 .setLogBtnOffsetY(300)
-
                 .setLogoImgPath("loginimg")
                 .setLogoWidth(160)
                 .setLogoHeight(160)
@@ -419,7 +425,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 .setLogBtnBackgroundPath("login_btn_bg")
 //                .setScreenOrientation(authPageOrientation)
                 .setWebNavColor(Color.WHITE)
-                .setWebViewStatusBarColor(Color.RED)
+                .setWebViewStatusBarColor(Color.WHITE)
                 .setWebNavTextColor(Color.BLACK)
                 .setWebNavReturnImgPath("icon_nav_back_gray")
                 .create());
@@ -431,13 +437,13 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     }
 
     // dialog登录
-    public void loginDialog(final MethodCall call, final MethodChannel.Result methodResult) {
+    public void loginDialog(final MethodCall call, final Result methodResult) {
         getAuthListener();
         mAlicomAuthHelper.getLoginToken(mContext, 5000);
     }
 
     // 获取登录token
-    public void getToken(final MethodCall call, final MethodChannel.Result methodResult) {
+    public void getToken(final MethodCall call, final Result methodResult) {
         getAuthListener();
         mAlicomAuthHelper.getVerifyToken(5000);
     }
@@ -605,7 +611,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
 
     // 自定义UI
     private void initDynamicView(MethodCall call) {
-        android.util.Log.e(TAG, "initDynamicView: " );
+        Log.e(TAG, "initDynamicView: " );
         Map viewConfig = (Map) call.argument("config");
 
 //        if (dataStatus( viewConfig, "isHiddenCustom")) {
@@ -680,7 +686,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     }
 
     /// ⼀键登录授权⻚⾯
-    private void configLoginTokenPort(final MethodCall call, final MethodChannel.Result methodResult) {
+    private void configLoginTokenPort(final MethodCall call, final Result methodResult) {
         configBuilder(call);
 
         initDynamicView(call);
@@ -718,7 +724,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     }
 
     /// 弹窗授权⻚⾯
-    private void configLoginTokenPortDialog(final MethodCall call, final MethodChannel.Result methodResult) {
+    private void configLoginTokenPortDialog(final MethodCall call, final Result methodResult) {
         configBuilder(call);
 
         initDynamicView(call);
