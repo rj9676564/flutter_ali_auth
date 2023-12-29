@@ -52,6 +52,10 @@ abstract class AliAuthPlatform extends PlatformInterface {
     throw UnimplementedError('pause() has not been implemented.');
   }
 
+  void checkEnvAvailable() {
+    throw UnimplementedError('checkEnvAvailable() has not been implemented.');
+  }
+
   Future<void> openPage(String? pageRoute) {
     throw UnimplementedError('openPage() has not been implemented.');
   }

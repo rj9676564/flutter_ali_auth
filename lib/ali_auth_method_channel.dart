@@ -77,6 +77,12 @@ class MethodChannelAliAuth extends AliAuthPlatform {
         .invokeMethod('openPage', {'pageRoute': pageRoute ?? 'main_page'});
   }
 
+  /// checkEnvAvailable
+  @override
+  void checkEnvAvailable() async {
+    return await methodChannel.invokeMethod('checkEnvAvailable');
+  }
+
   @override
   Future<dynamic> get checkCellularDataEnable async {
     return await methodChannel.invokeMethod('checkCellularDataEnable');

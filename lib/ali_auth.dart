@@ -42,6 +42,11 @@ class AliAuth {
   }
 
   /// 强制关闭一键登录授权页面
+  static Future<void> checkEnvAvailable() async {
+    return AliAuthPlatform.instance.checkEnvAvailable();
+  }
+
+  /// 强制关闭一键登录授权页面
   static Future<String> getCurrentCarrierName() async {
     return AliAuthPlatform.instance.getCurrentCarrierName();
   }
