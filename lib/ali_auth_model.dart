@@ -698,7 +698,7 @@ Map<String, dynamic> _$AliAuthModelToJson(AliAuthModel instance) =>
 AliAuthModel getConfig() {
   return AliAuthModel.fromJson({
     'isDialog': false,
-    'isDebug': true,
+    'isDebug': false,
     'customPageBackgroundLyout': true,
     'isHiddenCustom': true,
     'statusBarColor': "#00ffffff",

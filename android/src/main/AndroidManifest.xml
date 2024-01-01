@@ -1,9 +1,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.jokui.rao.auth.ali_auth">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.jokui.rao.auth.ali_auth">
 
+    <!--允许访问网络状态的权限-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!--允许修改网络状态的权限-->
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <!--允许修改 WIFI 状态的权限。-->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <!--允许访问 WIFI 状态的权限-->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
-    <application>
+    <application
+        android:usesCleartextTraffic="true"
+        tools:targetApi="m">
         <!--协议页面webview-->
         <activity
             android:name="com.mobile.auth.gatewayauth.activity.AuthWebVeiwActivity"
@@ -27,5 +39,12 @@
             android:exported="false"
             android:launchMode="singleTask"
             android:screenOrientation="behind" />
+        <activity
+            android:name="io.flutter.embedding.android.FlutterActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:windowSoftInputMode="adjustResize"
+            android:usesCleartextTraffic="true"/>
     </application>
 </manifest>

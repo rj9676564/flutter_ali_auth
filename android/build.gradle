@@ -16,8 +16,8 @@ rootProject.allprojects {
     repositories {
         google()
         jcenter()
-        maven {
-            url "https://d.mrlb.cc:8082/repository/3rd-release/"
+        flatDir{
+            dirs project(":ali_auth").file("libs")
         }
     }
 }
@@ -25,25 +25,34 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 33
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
         disable 'InvalidPackage'
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8 // 使用适当的版本，例如 Java 8 或 Java 11
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.alibaba:fastjson:1.2.61'
     // 更换加载方式
-    implementation 'cc.mrlb:crashshield:2.0.3:release@aar'
-    implementation 'cc.mrlb:main:2.0.3:release@aar'
-    implementation 'cc.mrlb:logger:2.0.3:release@aar'
-    implementation 'cc.mrlb:phonenumber:2.0.3:release@aar'
+//    implementation 'cc.mrlb:crashshield:2.0.3:release@aar'
+//    implementation 'cc.mrlb:main:2.0.3:release@aar'
+//    implementation 'cc.mrlb:logger:2.0.3:release@aar'
+//    implementation 'cc.mrlb:phonenumber:2.0.3:release@aar'
+
+    implementation(name:'auth_number_product-2.12.15-log-online-standard-release', ext:'aar')
+//    implementation(name:'auth_number_product-2.12.17.2-release', ext:'aar')
+    implementation(name:'crashshield-2.1.4-release', ext:'aar')
+    implementation(name:'main-2.1.8-release', ext:'aar')
+    implementation(name:'logger-2.1.8-release', ext:'aar')
     // implementation project(":libs")
 }

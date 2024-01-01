@@ -89,6 +89,10 @@ class AliAuthPlugin {
     return await _channel.invokeMethod('appleLogin');
   }
 
+  static quitLoginPage() async {
+    return await _channel.invokeMethod('quitLoginPage');
+  }
+
   /// 数据监听
   static loginListen(
       {bool type = true, required Function onEvent, Function? onError}) async {

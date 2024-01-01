@@ -5,8 +5,6 @@
 //  Created by yangli on 15/03/2018.
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
-
 #import "TXCustomModel.h"
 #import "PNSReporter.h"
 
@@ -74,7 +72,7 @@ typedef NS_ENUM(NSInteger, PNSAuthType) {
  *
  *          授权页控件点击事件：700000（点击授权页返回按钮）、700001（点击切换其他登录方式）、
  *          700002（点击登录按钮事件，根据返回字典里面的 "isChecked"字段来区分check box是否被选中，只有被选中的时候内部才会去获取Token）、700003（点击check box事件）、700004（点击协议富文本文字）
-            接口回调其他事件：600001（授权页唤起成功）、600002（授权页唤起失败）、600000（成功获取Token）、600011（获取Token失败）、
+ 接口回调其他事件：600001（授权页唤起成功）、600002（授权页唤起失败）、600000（成功获取Token）、600011（获取Token失败）、
  *          600015（获取Token超时）、600013（运营商维护升级，该功能不可用）、600014（运营商维护升级，该功能已达最大调用次数）.....
  */
 - (void)getLoginTokenWithTimeout:(NSTimeInterval)timeout controller:(UIViewController *_Nonnull)controller model:(TXCustomModel *_Nullable)model complete:(void (^_Nullable)(NSDictionary * _Nonnull resultDic))complete;
@@ -86,6 +84,11 @@ typedef NS_ENUM(NSInteger, PNSAuthType) {
  *  @param  complete 结果异步回调到主线程，"resultDic"里面的"resultCode"值请参考PNSReturnCode
  */
 - (void)debugLoginUIWithController:(UIViewController *_Nonnull)controller model:(TXCustomModel *_Nullable)model complete:(void (^_Nullable)(NSDictionary * _Nonnull resultDic))complete;
+
+/**
+ *  授权页弹起后，修改checkbox按钮选中状态，当checkout按钮隐藏时，设置不生效
+ */
+- (void)setCheckboxIsChecked:(BOOL)isChecked;
 
 /**
  *  手动隐藏一键登录获取登录Token之后的等待动画，默认为自动隐藏，当设置 TXCustomModel 实例 autoHideLoginLoading = NO 时, 可调用该方法手动隐藏
@@ -103,6 +106,11 @@ typedef NS_ENUM(NSInteger, PNSAuthType) {
  *  获取日志埋点相关控制对象
  */
 - (PNSReporter * _Nonnull)getReporter;
+
+/**
+ 关闭二次授权弹窗页
+ */
+- (void)closePrivactAlertView;
 
 
 
