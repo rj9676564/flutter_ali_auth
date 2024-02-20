@@ -49,8 +49,8 @@ dependencies {
 //    implementation 'cc.mrlb:logger:2.0.3:release@aar'
 //    implementation 'cc.mrlb:phonenumber:2.0.3:release@aar'
 
-    implementation(name:'auth_number_product-2.12.15-log-online-standard-release', ext:'aar')
-//    implementation(name:'auth_number_product-2.12.17.2-release', ext:'aar')
+    // implementation(name:'auth_number_product-2.12.15-log-online-standard-release', ext:'aar')
+   implementation(name:'auth_number_product-2.13.2.1-release', ext:'aar')
     implementation(name:'crashshield-2.1.4-release', ext:'aar')
     implementation(name:'main-2.1.8-release', ext:'aar')
     implementation(name:'logger-2.1.8-release', ext:'aar')
