@@ -255,6 +255,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 });
             }
         };
+        Log.d(TAG, "init: " + PhoneNumberAuthHelper.getVersion());
         mAlicomAuthHelper = PhoneNumberAuthHelper.getInstance(mContext, mTokenListener);
 
         mAlicomAuthHelper.setAuthSDKInfo((String) _call.argument("sk"));

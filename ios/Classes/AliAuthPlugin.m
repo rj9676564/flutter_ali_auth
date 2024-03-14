@@ -260,7 +260,8 @@ bool bool_false = false;
     [self initSubviews];
     NSString *secret = dic[@"sk"];
     NSDictionary *config = dic[@"config"];
-    
+    NSString *version = [[TXCommonHandler sharedInstance] getVersion];
+    NSLog(@"aliauth version: %@",version);
     /// 判断是否是弹窗模式
     if([config boolValueForKey: @"isDialog" defaultValue: NO]){
       _model = [PNSBuildModelUtils buildNewAlertModel: config
