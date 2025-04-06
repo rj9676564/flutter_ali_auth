@@ -125,6 +125,11 @@ bool bool_false = false;
       self->_eventSink(dict);
       return;
     }
+      
+      UIImage *activeBtnImage = [TXCommonUtils imageWithColor:UIColor.orangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
+      UIImage *hightLightBtnImage = [TXCommonUtils imageWithColor:UIColor.orangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
+      
+      
       TXCustomModel *model = [PNSBuildModelUtils buildFullScreenModel];
         model.supportedInterfaceOrientations = UIInterfaceOrientationMaskPortrait;
         NSLog(@"%@",model);
@@ -274,6 +279,7 @@ bool bool_false = false;
                                                     target: self];
       _model.supportedInterfaceOrientations = UIInterfaceOrientationMaskPortrait;
     }
+      // [[[TXCommonHandler sharedInstance] getReporter] setConsolePrintLoggerEnable:YES];
 
     // __weak typeof(self) weakSelf = self;
     [[TXCommonHandler sharedInstance] setAuthSDKInfo:secret complete:^(NSDictionary * _Nonnull resultDic) {
@@ -403,6 +409,48 @@ bool bool_false = false;
   float timeout = 5.0; //self.tf_timeout.text.floatValue;
   __weak typeof(self) weakSelf = self;
   UIViewController *_vc = [self findCurrentViewController];
+    model.privacyAlertIsNeedShow = YES;
+    model.privacyAlertMaskAlpha = 0.5;
+    model.privacyAlertMaskColor = UIColor.blackColor;
+    model.privacyAlertCornerRadiusArray = @[@10,@10,@10,@10];
+    model.privacyAlertBackgroundColor = UIColor.whiteColor;
+    model.privacyAlertAlpha = 1.0;
+    model.privacyAlertTitleContent = @"温馨提示";
+    model.privacyAlertTitleBackgroundColor = UIColor.whiteColor;
+    model.privacyAlertContentBackgroundColor = UIColor.whiteColor;
+    model.privacyAlertTitleFont = [UIFont systemFontOfSize:16];
+    model.privacyAlertTitleColor = UIColor.blackColor;
+    model.privacyAlertContentColors = @[UIColor.grayColor, UIColor.orangeColor];
+    model.privacyAlertContentAlignment = NSTextAlignmentLeft;
+    
+    model.privacyAlertBtnContent = @"同意并登录";
+    model.privacyAlertButtonTextColors = @[UIColor.whiteColor,UIColor.whiteColor];
+    model.privacyAlertButtonFont = [UIFont systemFontOfSize:15];
+    model.privacyAlertCloseButtonIsNeedShow = YES;
+    model.privacyAlertMaskIsNeedShow = YES;
+    model.privacyAlertIsNeedAutoLogin = YES;
+    model.tapPrivacyAlertMaskCloseAlert = NO;
+    model.expandAuthPageCheckedScope = YES;
+    model.privacyAlertCloseButtonIsNeedShow = YES;
+ 
+    model.privacyAlertTitleFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
+        return CGRectMake(0, 30, frame.size.width, frame.size.height);
+    };
+    model.privacyAlertPrivacyContentFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
+        return CGRectMake(0+25, frame.origin.y+20, frame.size.width-50, frame.size.height);
+    };
+    
+    model.privacyAlertButtonFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
+        return CGRectMake(superViewSize.width * 0.5 - superViewSize.width * 0.5/2 ,superViewSize.height - 50, superViewSize.width * 0.5, 40);;
+    };
+    
+    UIImage *activeBtnImage = [TXCommonUtils imageWithColor:UIColor.orangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
+    UIImage *hightLightBtnImage = [TXCommonUtils imageWithColor:UIColor.orangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
+    model.privacyAlertBtnBackgroundImages = @[activeBtnImage, hightLightBtnImage];
+    model.privacyAlertFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
+        return CGRectMake(40, (superViewSize.height - 150)*0.5, screenSize.width-80, 180);
+    };
+    
     
   //1. 调用check接口检查及准备接口调用环境
   [[TXCommonHandler sharedInstance] checkEnvAvailableWithAuthType:PNSAuthTypeLoginToken complete:^(NSDictionary * _Nullable resultDic) {
