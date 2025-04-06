@@ -47,10 +47,17 @@
     model.numberColor = [self colorWithHex:0x3971fe alpha: 1];
     model.numberFont = [UIFont systemFontOfSize:30.0];
     model.loginBtnText = [[NSAttributedString alloc] initWithString:@"一键登录" attributes:@{NSForegroundColorAttributeName : UIColor.whiteColor,NSFontAttributeName : [UIFont systemFontOfSize:20.0]}];
+//    model.loginBtnBgImgs = @[
+//      [UIImage imageNamed:@"button_click"],
+//      [UIImage imageNamed:@"button_unclick"],
+//      [UIImage imageNamed:@"button_click"]
+//    ];
+    UIImage *activeImage = [TXCommonUtils imageWithColor:UIColor.orangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
+    UIImage *hightLightImage = [TXCommonUtils imageWithColor:UIColor.systemOrangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
     model.loginBtnBgImgs = @[
-      [UIImage imageNamed:@"button_click"],
-      [UIImage imageNamed:@"button_unclick"],
-      [UIImage imageNamed:@"button_click"]
+        activeImage,
+        activeImage,
+        activeImage
     ];
     //model.autoHideLoginLoading = NO;
     // model.privacyOne = @[@"《隐私1》",@"https://www.taobao.com/"];
