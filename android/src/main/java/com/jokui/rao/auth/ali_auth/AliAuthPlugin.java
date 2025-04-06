@@ -30,12 +30,14 @@ import io.flutter.plugin.common.PluginRegistry;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,10 +49,12 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.mobile.auth.gatewayauth.ActivityResultListener;
 import com.mobile.auth.gatewayauth.AuthRegisterViewConfig;
 import com.mobile.auth.gatewayauth.AuthRegisterXmlConfig;
 import com.mobile.auth.gatewayauth.AuthUIConfig;
 import com.mobile.auth.gatewayauth.AuthUIControlClickListener;
+import com.mobile.auth.gatewayauth.CustomInterface;
 import com.mobile.auth.gatewayauth.PhoneNumberAuthHelper;
 import com.mobile.auth.gatewayauth.PreLoginResultListener;
 import com.mobile.auth.gatewayauth.TokenResultListener;
@@ -118,7 +122,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         if (_events == null) {
-            result.error("600","请先调用 loginListen",null);
+            result.error("600", "请先调用 loginListen", null);
         }
         switch (call.method) {
             case "init":
@@ -369,9 +373,9 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         mAlicomAuthHelper.accelerateLoginPage(timeOut, new PreLoginResultListener() {
             @Override
             public void onTokenSuccess(final String vendor) {
-                Log.e(TAG, vendor+" onTokenFailed: ");
-                HashMap map=new HashMap<>();
-                map.put("vendor",vendor);
+                Log.e(TAG, vendor + " onTokenFailed: ");
+                HashMap map = new HashMap<>();
+                map.put("vendor", vendor);
                 result.success(map);
                 activity.runOnUiThread(new Runnable() {
                     @Override
@@ -388,7 +392,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
 
             @Override
             public void onTokenFailed(final String vendor, final String ret) {
-                Log.e(TAG, vendor+" onTokenFailed: "+ret);
+                Log.e(TAG, vendor + " onTokenFailed: " + ret);
                 result.success(null);
                 activity.runOnUiThread(new Runnable() {
                     @Override
@@ -406,11 +410,33 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
 
     // 正常登录
     public void login(final MethodCall call, final Result methodResult) {
+        PhoneNumberAuthHelper mAuthHelper = mAlicomAuthHelper;
+        mAuthHelper.removeAuthRegisterXmlConfig();
+        mAuthHelper.removeAuthRegisterViewConfig();
+        mAuthHelper.removePrivacyAuthRegisterViewConfig();
+        mAuthHelper.removePrivacyRegisterXmlConfig();
+        //请注意，同一Drawable对象不可在sdk内相关Drawable背景重复使用
+        Drawable btnDrawable = mContext.getDrawable(R.drawable.login_btn_bg);
+        Drawable alertBtnDrawable = mContext.getDrawable(R.drawable.login_btn_bg);
+        //添加自定义切换其他登录方式
+        mAuthHelper.setActivityResultListener(new ActivityResultListener() {
+            @Override
+            public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                Log.i(TAG, "requestcode=" + requestCode + ";resultcode=" + resultCode + ";data=" + data.toString());
+                if (requestCode == 1002 && resultCode == 1) {
+                    mAuthHelper.quitLoginPage();
+                }
+            }
+        });
 
         int authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
         if (Build.VERSION.SDK_INT == 26) {
             authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_BEHIND;
         }
+        updateScreenSize(authPageOrientation);
+        int dialogHeight = (int) (mScreenHeightDp / 3f);
+        int dialogWidth = (int) (mScreenWidthDp * 3 / 4f);
+
         mAlicomAuthHelper.setAuthUIConfig(new AuthUIConfig.Builder()
                 .setAppPrivacyOne("《用户服务协议》", "https://nest-h5.juhesaas.com/pages_h5/privacy-policy/index")
                 .setAppPrivacyTwo("《平台隐私政策》", "https://nest-h5.juhesaas.com/pages_h5/privacy-policy/index")
@@ -450,6 +476,27 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 .setWebViewStatusBarColor(Color.WHITE)
                 .setWebNavTextColor(Color.BLACK)
                 .setWebNavReturnImgPath("icon_nav_back_gray")
+
+                //二次弹窗
+                .setPrivacyAlertIsNeedShow(true)
+                .setPrivacyAlertIsNeedAutoLogin(true)
+                .setPrivacyAlertTitleContent("温馨提示")
+                .setPrivacyAlertBackgroundColor(Color.WHITE)
+                .setPrivacyAlertMaskAlpha(0.5f)
+                .setPrivacyAlertAlignment(Gravity.CENTER)
+                .setPrivacyAlertWidth(dialogWidth)
+                .setPrivacyAlertHeight(180)
+                .setPrivacyAlertCornerRadiusArray(new int[]{10, 10, 10, 10})
+                .setPrivacyAlertTitleTextSize(15)
+                .setPrivacyAlertBtnHeigth(dp2px(mContext, 10))
+                .setPrivacyAlertContentTextSize(12)
+                .setPrivacyAlertContentColor(Color.BLACK)
+                .setPrivacyAlertContentHorizontalMargin(40)
+                .setPrivacyAlertBtnTextColor(Color.WHITE)
+                .privacyAlertProtocolNameUseUnderLine(true)
+//                .setPrivacyAlertBtnTextColorPath("privacy_alert_btn_color")
+//                .setPrivacyAlertEntryAnimation("in_activity")
+//                .setPrivacyAlertExitAnimation("out_activity")
                 .create());
 //        initDynamicView(call);
 //        getAuthListener();
