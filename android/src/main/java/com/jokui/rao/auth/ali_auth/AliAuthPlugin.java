@@ -34,13 +34,17 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -65,6 +69,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.jokui.rao.auth.ali_auth.AppUtils.dp2px;
+import static com.jokui.rao.auth.ali_auth.AppUtils.px2dp;
 import static com.mobile.auth.gatewayauth.PhoneNumberAuthHelper.SERVICE_TYPE_LOGIN;
 
 /**
@@ -416,31 +421,50 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         mAuthHelper.removePrivacyAuthRegisterViewConfig();
         mAuthHelper.removePrivacyRegisterXmlConfig();
         //请注意，同一Drawable对象不可在sdk内相关Drawable背景重复使用
-        Drawable btnDrawable = mContext.getDrawable(R.drawable.login_btn_bg);
-        Drawable alertBtnDrawable = mContext.getDrawable(R.drawable.login_btn_bg);
         //添加自定义切换其他登录方式
-        mAuthHelper.setActivityResultListener(new ActivityResultListener() {
-            @Override
-            public void onActivityResult(int requestCode, int resultCode, Intent data) {
-                Log.i(TAG, "requestcode=" + requestCode + ";resultcode=" + resultCode + ";data=" + data.toString());
-                if (requestCode == 1002 && resultCode == 1) {
-                    mAuthHelper.quitLoginPage();
-                }
+        mAuthHelper.setActivityResultListener((requestCode, resultCode, data) -> {
+            Log.i(TAG, "requestcode=" + requestCode + ";resultcode=" + resultCode + ";data=" + data.toString());
+            if (requestCode == 1002 && resultCode == 1) {
+                mAuthHelper.quitLoginPage();
             }
         });
+
+//        mAuthHelper.addPrivacyAuthRegistViewConfig("cancel_dialog", new AuthRegisterViewConfig.Builder()
+//                .setView(initCancelView(dp2px(mContext, 7.2f)))
+//                .setRootViewId(AuthRegisterViewConfig.RootViewId.ROOT_VIEW_ID_NUMBER)
+//                .setCustomInterface(context -> mAuthHelper.quitPrivacyPage()).build());
 
         int authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
         if (Build.VERSION.SDK_INT == 26) {
             authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_BEHIND;
         }
         updateScreenSize(authPageOrientation);
-        int dialogHeight = (int) (mScreenHeightDp / 3f);
         int dialogWidth = (int) (mScreenWidthDp * 3 / 4f);
-
+        mAlicomAuthHelper.getReporter().setLoggerEnable(true);
+        mAlicomAuthHelper.closeAuthPageReturnBack(true);
+        GradientDrawable roundedBg = new GradientDrawable();
+        roundedBg.setColor(mContext.getResources().getColor(R.color.colorAccent)); // 背景色
+        roundedBg.setCornerRadius(dp2px(mContext, 2)); // 圆角半径（单位像素）
+        mAuthHelper.addPrivacyRegisterXmlConfig(new AuthRegisterXmlConfig.Builder()
+                .setLayout(R.layout.custom_privacy_port, new AbstractPnsViewDelegate() {
+                    @Override
+                    public void onViewCreated(View view) {
+//                        GradientDrawable roundedBg = new GradientDrawable();
+//                        roundedBg.setColor(getResources().getColor(R.color.colorAccent)); // 背景色
+//                        roundedBg.setCornerRadius(dp2px(mContext, 2)); // 圆角半径（单位像素）
+// 应用到 TextView
+//                        findViewById(R.id.tv_cancel).setBackground(roundedBg);
+                        findViewById(R.id.tv_cancel).setOnClickListener(v -> mAuthHelper.quitPrivacyPage());
+                    }
+                })
+                .build());
         mAlicomAuthHelper.setAuthUIConfig(new AuthUIConfig.Builder()
                 .setAppPrivacyOne("《用户服务协议》", "https://nest-h5.juhesaas.com/pages_h5/privacy-policy/index")
                 .setAppPrivacyTwo("《平台隐私政策》", "https://nest-h5.juhesaas.com/pages_h5/privacy-policy/index")
                 .setNavText("")
+                .setNavReturnHidden(true)
+                .setNavHidden(true)
+                .setSwitchAccHidden(true)
                 .setAppPrivacyColor(Color.GRAY, Color.parseColor("#002E00"))
                 .setSwitchAccHidden(false)
                 .setLogBtnToastHidden(true)
@@ -450,10 +474,6 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 .setCheckboxHidden(false)
 //                .setStatusBarHidden(true)
 //                .setStatusBarColor(Color.WHITE)
-                .setNavColor(Color.WHITE)
-                .setNavTextColor(Color.BLACK)
-                .setNavReturnImgPath("icon_nav_back_gray")
-                .setNavReturnHidden(false)
 //                .setStatusBarUIFlag(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
                 .setSloganHidden(true)
                 .setWebNavTextSizeDp(20)
@@ -470,7 +490,8 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 .setVendorPrivacySuffix("》")
 //                .setPageBackgroundPath("page_background_color")
                 .setLogoImgPath("logo_no_text")
-                .setLogBtnBackgroundPath("login_btn_bg")
+//                .setLogBtnBackgroundPath("login_btn_bg")
+                .setLogBtnBackgroundDrawable(roundedBg)
 //                .setScreenOrientation(authPageOrientation)
                 .setWebNavColor(Color.WHITE)
                 .setWebViewStatusBarColor(Color.WHITE)
@@ -486,14 +507,21 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 .setPrivacyAlertAlignment(Gravity.CENTER)
                 .setPrivacyAlertWidth(dialogWidth)
                 .setPrivacyAlertHeight(180)
+
                 .setPrivacyAlertCornerRadiusArray(new int[]{10, 10, 10, 10})
                 .setPrivacyAlertTitleTextSize(15)
-                .setPrivacyAlertBtnHeigth(dp2px(mContext, 10))
                 .setPrivacyAlertContentTextSize(12)
                 .setPrivacyAlertContentColor(Color.BLACK)
-                .setPrivacyAlertContentHorizontalMargin(40)
-                .setPrivacyAlertBtnTextColor(Color.WHITE)
+                .setPrivacyAlertContentHorizontalMargin(30)
                 .privacyAlertProtocolNameUseUnderLine(true)
+                .setPrivacyAlertBtnOffsetX(160)
+                .setPrivacyAlertBtnOffsetY(45)
+                .setPrivacyAlertBtnBackgroundImgDrawable(roundedBg)
+                .setPrivacyAlertBtnWidth(100)
+                .setPrivacyAlertBtnHeigth(30)
+                .setPrivacyAlertBtnTextColor(Color.WHITE)
+
+                .setPrivacyAlertBtnContent("同意")
 //                .setPrivacyAlertBtnTextColorPath("privacy_alert_btn_color")
 //                .setPrivacyAlertEntryAnimation("in_activity")
 //                .setPrivacyAlertExitAnimation("out_activity")
@@ -661,40 +689,9 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         return imageView;
     }
 
-    private View createLandDialogCustomSwitchView(int layoutHeight, float leftMargin, float topMargin, float fontSize) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.custom_slogan, new RelativeLayout(mContext), false);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-        );
-        // 左侧按钮布局
-//        v.findViewById(R.id.login_left).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                Log.d(TAG, ("login_left 被点击了"));
-//            }
-//        });
-//
-//        // 右侧按钮布局
-//        v.findViewById(R.id.login_right).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                Log.d(TAG, ("login_right 被点击了"));
-//            }
-//        });
-        TextView txv = v.findViewById(R.id.slogan_title);
-        txv.setTextSize(fontSize);
-        // int size = AppUtils.dp2px(context, 23);
-        layoutParams.topMargin = AppUtils.px2dp(mContext, topMargin);
-        layoutParams.leftMargin = AppUtils.px2dp(mContext, leftMargin);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-        v.setLayoutParams(layoutParams);
-        return v;
-    }
-
     // 自定义UI
     private void initDynamicView(MethodCall call) {
         Log.e(TAG, "initDynamicView: ");
-        Map viewConfig = (Map) call.argument("config");
-
 //        if (dataStatus( viewConfig, "isHiddenCustom")) {
         int getCustomXml = mContext.getResources().getIdentifier("custom_login", "layout", mContext.getPackageName());
         switchTV = LayoutInflater.from(mContext).inflate(getCustomXml, new RelativeLayout(mContext), false);
@@ -1189,11 +1186,62 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     }
 
     /// 获取屏幕
-    private void updateScreenSize(int authPageScreenOrientation) {
+    protected void updateScreenSize(int authPageScreenOrientation) {
         int screenHeightDp = AppUtils.px2dp(mContext, AppUtils.getPhoneHeightPixels(mContext));
         int screenWidthDp = AppUtils.px2dp(mContext, AppUtils.getPhoneWidthPixels(mContext));
-        mScreenWidthDp = screenWidthDp;
-        mScreenHeightDp = screenHeightDp;
+        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        if (authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_BEHIND) {
+            authPageScreenOrientation = activity.getRequestedOrientation();
+        }
+        if (authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE) {
+            rotation = Surface.ROTATION_90;
+        } else if (authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT) {
+            rotation = Surface.ROTATION_180;
+        }
+        switch (rotation) {
+            case Surface.ROTATION_0:
+            case Surface.ROTATION_180:
+                mScreenWidthDp = screenWidthDp;
+                mScreenHeightDp = screenHeightDp;
+                break;
+            case Surface.ROTATION_90:
+            case Surface.ROTATION_270:
+                mScreenWidthDp = screenHeightDp;
+                mScreenHeightDp = screenWidthDp;
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    protected View initCancelView(int marginTop) {
+        TextView switchTV = new TextView(mContext);
+        float dialogWidth = (mScreenWidthDp * 3 / 4f);
+        LinearLayout.LayoutParams mLayoutParams = new LinearLayout.LayoutParams(dp2px(mContext, dialogWidth/2-15), dp2px(mContext, 30));
+
+        //一键登录按钮默认marginTop 270dp
+        mLayoutParams.setMargins(dp2px(mContext, 10), dp2px(mContext, marginTop), 0, 0);
+//        mLayoutParams.addRule(RelativeLayout.ALIGN_LEFT, RelativeLayout.TRUE);
+        switchTV.setText("取消" );
+        switchTV.setTextColor(Color.WHITE);
+        switchTV.setGravity(Gravity.CENTER);
+//        switchTV.setBackgroundResource(R.drawable.authsdk_privacy_btn);
+
+        GradientDrawable roundedBg = new GradientDrawable();
+        roundedBg.setColor(mContext.getResources().getColor(R.color.colorPrimary)); // 背景色
+        roundedBg.setCornerRadius(dp2px(mContext, 2)); // 圆角半径（单位像素）
+
+// 应用到 TextView
+        switchTV.setBackground(roundedBg);
+
+        switchTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0F);
+        switchTV.setLayoutParams(mLayoutParams);
+        return switchTV;
     }
 
 }
