@@ -279,7 +279,7 @@ bool bool_false = false;
                                                     target: self];
       _model.supportedInterfaceOrientations = UIInterfaceOrientationMaskPortrait;
     }
-      // [[[TXCommonHandler sharedInstance] getReporter] setConsolePrintLoggerEnable:YES];
+      [[[TXCommonHandler sharedInstance] getReporter] setConsolePrintLoggerEnable:YES];
 
     // __weak typeof(self) weakSelf = self;
     [[TXCommonHandler sharedInstance] setAuthSDKInfo:secret complete:^(NSDictionary * _Nonnull resultDic) {
@@ -439,10 +439,9 @@ bool bool_false = false;
     model.privacyAlertPrivacyContentFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
         return CGRectMake(0+25, frame.origin.y+20, frame.size.width-50, frame.size.height);
     };
+//    privacyAlertBtnContent
     
-    model.privacyAlertButtonFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
-        return CGRectMake(superViewSize.width * 0.5 - superViewSize.width * 0.5/2 ,superViewSize.height - 50, superViewSize.width * 0.5, 40);;
-    };
+ 
     
     UIImage *activeBtnImage = [TXCommonUtils imageWithColor:UIColor.orangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
     UIImage *hightLightBtnImage = [TXCommonUtils imageWithColor:UIColor.orangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
@@ -450,6 +449,40 @@ bool bool_false = false;
     model.privacyAlertFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
         return CGRectMake(40, (superViewSize.height - 150)*0.5, screenSize.width-80, 180);
     };
+    
+   
+//    ----------------
+    UIButton *cancelBtn = [[UIButton alloc] init];
+    [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+    [cancelBtn setTitleColor:UIColor.orangeColor forState:UIControlStateNormal];
+    
+//    cancelPrivacyAlert
+    [cancelBtn addTarget:self action:@selector(cancelPrivacyAlert:) forControlEvents:UIControlEventTouchUpInside];
+//    model.privacyAlertTitleFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
+//        return CGRectMake(0, 20, frame.size.width, frame.size.height);
+//    };
+//    model.privacyAlertPrivacyContentFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
+//        return CGRectMake(30, frame.origin.y+10, frame.size.width-40, frame.size.height+30);
+//    };
+    
+    model.privacyAlertButtonFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
+        return CGRectMake(superViewSize.width * 0.5+20 ,superViewSize.height - 50, superViewSize.width * 0.5-50, 40);;
+    };
+//    model.privacyAlertFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
+//        return CGRectMake(40, (superViewSize.height - 150)*0.5, screenSize.width-80, 150);
+//    };
+    model.privacyAlertCustomViewBlock = ^(UIView * _Nonnull superPrivacyAlertCustomView) {
+        [superPrivacyAlertCustomView addSubview:cancelBtn];
+    };
+//
+    model.privacyAlertCustomViewLayoutBlock = ^(CGRect privacyAlertFrame, CGRect privacyAlertTitleFrame, CGRect privacyAlertPrivacyContentFrame, CGRect privacyAlertButtonFrame, CGRect privacyAlertCloseFrame) {
+        cancelBtn.backgroundColor = [UIColor orangeColor];
+        [cancelBtn setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+        cancelBtn.layer.cornerRadius = 5;
+        [cancelBtn.titleLabel setFont:[UIFont systemFontOfSize:14]];
+        cancelBtn.frame = CGRectMake(30, CGRectGetHeight(privacyAlertFrame) - 50, CGRectGetWidth(privacyAlertFrame) * 0.5-50, 40);
+    };
+    
     
     
   //1. 调用check接口检查及准备接口调用环境
@@ -736,6 +769,10 @@ bool bool_false = false;
         }
     }
     return topViewController;
+}
+
+- (void)cancelPrivacyAlert:(UIButton *)btn {
+    [[TXCommonHandler sharedInstance] closePrivactAlertView];
 }
 
 @end
