@@ -284,23 +284,20 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         mAlicomAuthHelper.checkEnvAvailable(SERVICE_TYPE_LOGIN);
 
         // UI 点击回调
-        mAlicomAuthHelper.setUIClickListener(new AuthUIControlClickListener() {
-            @Override
-            public void onClick(String code, Context context, String jsonObj) {
-                Log.e("xxxxxx", "OnUIControlClick:code=" + code + ", jsonObj=" + (jsonObj == null ? "" : jsonObj));
-                jsonObject.put("code", code);
-                jsonObject.put("msg", "phone");
-                jsonObject.put("data", null);
-                if (jsonObj != null && jsonObj.contains("isChecked")) {
-                    JSONObject isCheck = JSONObject.parseObject(jsonObj);
-                    if (!isCheck.getBooleanValue("isChecked")) {
-                        Toast.makeText(context, "请同意并勾选用户协议及隐私政策", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+        mAlicomAuthHelper.setUIClickListener((code, context, jsonObj) -> {
+            Log.e("xxxxxx", "OnUIControlClick:code=" + code + ", jsonObj=" + (jsonObj == null ? "" : jsonObj));
+            jsonObject.put("code", code);
+            jsonObject.put("msg", "phone");
+            jsonObject.put("data", null);
+            if (jsonObj != null && jsonObj.contains("isChecked")) {
+                JSONObject isCheck = JSONObject.parseObject(jsonObj);
+                if (!isCheck.getBooleanValue("isChecked")) {
+                    Toast.makeText(context, "请同意并勾选用户协议及隐私政策", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-                //转化成json字符串
-                _events.success(jsonObject);
             }
+            //转化成json字符串
+            _events.success(jsonObject);
         });
 
         // 开始预取号
@@ -416,10 +413,10 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     // 正常登录
     public void login(final MethodCall call, final Result methodResult) {
         PhoneNumberAuthHelper mAuthHelper = mAlicomAuthHelper;
-        mAuthHelper.removeAuthRegisterXmlConfig();
-        mAuthHelper.removeAuthRegisterViewConfig();
-        mAuthHelper.removePrivacyAuthRegisterViewConfig();
-        mAuthHelper.removePrivacyRegisterXmlConfig();
+//        mAuthHelper.removeAuthRegisterXmlConfig();
+//        mAuthHelper.removeAuthRegisterViewConfig();
+//        mAuthHelper.removePrivacyAuthRegisterViewConfig();
+//        mAuthHelper.removePrivacyRegisterXmlConfig();
         //请注意，同一Drawable对象不可在sdk内相关Drawable背景重复使用
         //添加自定义切换其他登录方式
         mAuthHelper.setActivityResultListener((requestCode, resultCode, data) -> {
@@ -444,7 +441,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         mAlicomAuthHelper.closeAuthPageReturnBack(true);
         GradientDrawable roundedBg = new GradientDrawable();
         roundedBg.setColor(mContext.getResources().getColor(R.color.colorAccent)); // 背景色
-        roundedBg.setCornerRadius(dp2px(mContext, 2)); // 圆角半径（单位像素）
+        roundedBg.setCornerRadius(dp2px(mContext, 15)); // 圆角半径（单位像素）
         mAuthHelper.addPrivacyRegisterXmlConfig(new AuthRegisterXmlConfig.Builder()
                 .setLayout(R.layout.custom_privacy_port, new AbstractPnsViewDelegate() {
                     @Override
@@ -521,13 +518,9 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 .setPrivacyAlertBtnHeigth(30)
                 .setPrivacyAlertBtnTextColor(Color.WHITE)
 
-                .setPrivacyAlertBtnContent("同意")
-//                .setPrivacyAlertBtnTextColorPath("privacy_alert_btn_color")
-//                .setPrivacyAlertEntryAnimation("in_activity")
-//                .setPrivacyAlertExitAnimation("out_activity")
+                .setPrivacyAlertBtnContent("同意并继续")
                 .create());
-//        initDynamicView(call);
-//        getAuthListener();
+
         mAlicomAuthHelper.setAuthPageUseDayLight(false);
         mAlicomAuthHelper.getLoginToken(mContext, 5000);
     }
@@ -1218,30 +1211,5 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         }
     }
 
-
-    protected View initCancelView(int marginTop) {
-        TextView switchTV = new TextView(mContext);
-        float dialogWidth = (mScreenWidthDp * 3 / 4f);
-        LinearLayout.LayoutParams mLayoutParams = new LinearLayout.LayoutParams(dp2px(mContext, dialogWidth/2-15), dp2px(mContext, 30));
-
-        //一键登录按钮默认marginTop 270dp
-        mLayoutParams.setMargins(dp2px(mContext, 10), dp2px(mContext, marginTop), 0, 0);
-//        mLayoutParams.addRule(RelativeLayout.ALIGN_LEFT, RelativeLayout.TRUE);
-        switchTV.setText("取消" );
-        switchTV.setTextColor(Color.WHITE);
-        switchTV.setGravity(Gravity.CENTER);
-//        switchTV.setBackgroundResource(R.drawable.authsdk_privacy_btn);
-
-        GradientDrawable roundedBg = new GradientDrawable();
-        roundedBg.setColor(mContext.getResources().getColor(R.color.colorPrimary)); // 背景色
-        roundedBg.setCornerRadius(dp2px(mContext, 2)); // 圆角半径（单位像素）
-
-// 应用到 TextView
-        switchTV.setBackground(roundedBg);
-
-        switchTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0F);
-        switchTV.setLayoutParams(mLayoutParams);
-        return switchTV;
-    }
 
 }

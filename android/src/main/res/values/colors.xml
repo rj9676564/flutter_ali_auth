@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="transparent_background">#50FF4081</color>
+    <color name="privacy_alert_btn_color">#50FF4081</color>
+    <color name="privacy_alert_btn_color22">#40FF4081</color>
 </resources>

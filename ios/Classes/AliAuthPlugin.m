@@ -113,6 +113,14 @@ bool bool_false = false;
     }
   } else if ([@"quitLoginPage" isEqualToString:call.method]) {
       [[TXCommonHandler sharedInstance] hideLoginLoading];
+      
+      
+      UIViewController *_vc = [self findCurrentViewController];
+      
+          [_vc dismissViewControllerAnimated:YES completion:^{
+              
+          }];
+      
   } else if ([@"checkVerifyEnable" isEqualToString:call.method]) {
     [self checkVerifyEnable:call result:result];
   } else  if ([@"login" isEqualToString:call.method]) {
@@ -125,9 +133,7 @@ bool bool_false = false;
       self->_eventSink(dict);
       return;
     }
-      
-      UIImage *activeBtnImage = [TXCommonUtils imageWithColor:UIColor.orangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
-      UIImage *hightLightBtnImage = [TXCommonUtils imageWithColor:UIColor.orangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
+    
       
       
       TXCustomModel *model = [PNSBuildModelUtils buildFullScreenModel];
@@ -136,14 +142,24 @@ bool bool_false = false;
         NSLog(@"%@",_model);
       model.navColor = UIColor.whiteColor;
       model.navBackImage = [UIImage imageNamed:@"icon_nav_back_gray"];
-      model.navTitle =[[NSAttributedString alloc] initWithString:@"一键登录"];
+      model.navTitle =[[NSAttributedString alloc] initWithString:@""];
       model.logoImage = [UIImage imageNamed:@"logo_no_text.png"];
+//      model.loginBtnText = @"一键登录（推荐）";
+      NSDictionary *normalAttributes = @{
+          NSFontAttributeName: [UIFont systemFontOfSize:16 weight:UIFontWeightSemibold],
+          NSForegroundColorAttributeName: [UIColor whiteColor]
+      };
+      NSAttributedString *normalText = [[NSAttributedString alloc] initWithString:@"一键登录（推荐）" attributes:normalAttributes];
+
+      model.loginBtnText = normalText;
+      model.loginBtnBgImgs = @[[UIImage imageNamed:@"button_unclick"],[UIImage imageNamed:@"button_unclick"]];
+      
       model.alertBlurViewColor = UIColor.grayColor;
       model.privacyNavColor = UIColor.whiteColor;
       model.privacyColors=@[UIColor.grayColor,UIColor.orangeColor];
       model.privacyOperatorPreText = @"《";
       model.privacyOperatorSufText = @"》";
-
+      model.hideNavBackItem = YES;
       model.checkBoxImages = @[[UIImage imageNamed:@"checkbox"],[UIImage imageNamed:@"gouxuan1"]];
       model.checkBoxWH = 17;
       model.checkBoxIsHidden = NO;
@@ -151,7 +167,7 @@ bool bool_false = false;
       model.privacyNavBackImage = [UIImage imageNamed:@"icon_nav_back_gray.png"];
       model.privacyTwo = @[@"《平台隐私政策》",@"https://nest-h5.juhesaas.com/pages_h5/privacy-policy/index"];
       model.privacyNavTitleColor = UIColor.blackColor;
-      
+      model.privacyAlertBtnBackgroundImages = @[[UIImage imageNamed:@"button_unclick"],[UIImage imageNamed:@"button_unclick"]];
       model.logoFrameBlock =  ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
           frame.size.width = 160;
           frame.size.height = 160;
@@ -254,9 +270,12 @@ bool bool_false = false;
     NSDictionary *dict = @{@"msg": @"点击其它登录", @"resultCode": [NSString stringWithFormat:@"%ld",view.tag]};
     [self showResult:dict];
     UIViewController *_vc = [self findCurrentViewController];
-    [_vc dismissViewControllerAnimated:YES completion:^{
-        
-    }];
+    NSLog(@"view.tag = %ld", (long)view.tag);
+    if(view.tag !=10000){
+        [_vc dismissViewControllerAnimated:YES completion:^{
+            
+        }];
+    }
 }
 #pragma mark - 初始化SDK以及相关布局
 - (void)initSdk {
@@ -425,6 +444,7 @@ bool bool_false = false;
     
     model.privacyAlertBtnContent = @"同意并登录";
     model.privacyAlertButtonTextColors = @[UIColor.whiteColor,UIColor.whiteColor];
+
     model.privacyAlertButtonFont = [UIFont systemFontOfSize:15];
     model.privacyAlertCloseButtonIsNeedShow = YES;
     model.privacyAlertMaskIsNeedShow = YES;
@@ -443,20 +463,27 @@ bool bool_false = false;
     
  
     
-    UIImage *activeBtnImage = [TXCommonUtils imageWithColor:UIColor.orangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
-    UIImage *hightLightBtnImage = [TXCommonUtils imageWithColor:UIColor.orangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
-    model.privacyAlertBtnBackgroundImages = @[activeBtnImage, hightLightBtnImage];
+//    UIImage *activeBtnImage = [TXCommonUtils imageWithColor:UIColor.redColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
+//    UIImage *hightLightBtnImage = [TXCommonUtils imageWithColor:UIColor.redColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
+    
+    model.privacyAlertBtnBackgroundImages = @[[UIImage imageNamed:@"button_unclick"],[UIImage imageNamed:@"button_unclick"]];;
+    
     model.privacyAlertFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
         return CGRectMake(40, (superViewSize.height - 150)*0.5, screenSize.width-80, 180);
     };
     
    
 //    ----------------
+    //    cancelPrivacyAlert
     UIButton *cancelBtn = [[UIButton alloc] init];
     [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
     [cancelBtn setTitleColor:UIColor.orangeColor forState:UIControlStateNormal];
-    
-//    cancelPrivacyAlert
+    cancelBtn.backgroundColor = [UIColor whiteColor];  // White background
+    cancelBtn.layer.cornerRadius = 20;                 // Rounded corners
+    cancelBtn.layer.borderWidth = 1.0;                // Border width
+    cancelBtn.layer.borderColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:204/255.0 alpha:1.0].CGColor;  // #ccc border
+    [cancelBtn.titleLabel setFont:[UIFont systemFontOfSize:14]];
+
     [cancelBtn addTarget:self action:@selector(cancelPrivacyAlert:) forControlEvents:UIControlEventTouchUpInside];
 //    model.privacyAlertTitleFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
 //        return CGRectMake(0, 20, frame.size.width, frame.size.height);
@@ -474,12 +501,9 @@ bool bool_false = false;
     model.privacyAlertCustomViewBlock = ^(UIView * _Nonnull superPrivacyAlertCustomView) {
         [superPrivacyAlertCustomView addSubview:cancelBtn];
     };
-//
+//    
     model.privacyAlertCustomViewLayoutBlock = ^(CGRect privacyAlertFrame, CGRect privacyAlertTitleFrame, CGRect privacyAlertPrivacyContentFrame, CGRect privacyAlertButtonFrame, CGRect privacyAlertCloseFrame) {
-        cancelBtn.backgroundColor = [UIColor orangeColor];
-        [cancelBtn setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
-        cancelBtn.layer.cornerRadius = 5;
-        [cancelBtn.titleLabel setFont:[UIFont systemFontOfSize:14]];
+     
         cancelBtn.frame = CGRectMake(30, CGRectGetHeight(privacyAlertFrame) - 50, CGRectGetWidth(privacyAlertFrame) * 0.5-50, 40);
     };
     
