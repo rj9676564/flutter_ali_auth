@@ -74,9 +74,6 @@ typedef CGRect(^PNSBuildFrameBlock)(CGSize screenSize, CGSize superViewSize, CGR
 /** 构建标题栏右侧关闭按钮的frame，view布局或布局发生变化时调用，不实现则按默认处理 */
 @property (nonatomic, copy) PNSBuildFrameBlock alertCloseItemFrameBlock;
 
-/** 弹窗位置是否根据键盘弹起关闭动态调整，仅在键盘弹起后遮挡弹窗的情况生效，调整后弹窗将居于键盘上方，默认NO*/
-@property (nonatomic, assign) BOOL alertFrameChangeWithKeyboard;
-
 #pragma mark- 导航栏（只对全屏模式有效）
 /**授权页显示中，导航栏是否隐藏，默认NO*/
 @property (nonatomic, assign) BOOL navIsHidden;
@@ -384,8 +381,6 @@ typedef CGRect(^PNSBuildFrameBlock)(CGSize screenSize, CGSize superViewSize, CGR
 
 /** 二次隐私协议弹窗按钮文字内容 默认“同意”*/
 @property (nonatomic, copy) NSString *privacyAlertBtnContent;
-/** 二次隐私协议弹窗登录按钮的圆角值，如果值<=0则为直角 ，默认0*/
-@property (nonatomic, assign) CGFloat privacyAlertBtnCornerRadius;
 /** 二次隐私协议弹窗按钮按钮背景图片 ,默认高度50.0pt，@[激活状态的图片,高亮状态的图片] */
 @property (nonatomic, copy) NSArray<UIImage *> *privacyAlertBtnBackgroundImages;
 /** 二次隐私协议弹窗按钮文字颜色，默认黑色, @[激活状态的颜色,高亮状态的颜色] */

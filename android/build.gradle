@@ -50,9 +50,9 @@ dependencies {
 //    implementation 'cc.mrlb:phonenumber:2.0.3:release@aar'
 
     // implementation(name:'auth_number_product-2.12.15-log-online-standard-release', ext:'aar')
-   implementation(name:'auth_number_product-2.13.4-release', ext:'aar')
+   implementation(name:'auth_number_product-2.14.7-release', ext:'aar')
     implementation(name:'crashshield-2.1.4-release', ext:'aar')
-    implementation(name:'main-2.1.8-release', ext:'aar')
-    implementation(name:'logger-2.1.8-release', ext:'aar')
+    implementation(name:'main-2.2.3-release', ext:'aar')
+    implementation(name:'logger-2.2.2-release', ext:'aar')
     // implementation project(":libs")
 }

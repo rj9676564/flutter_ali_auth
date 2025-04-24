@@ -144,7 +144,6 @@ bool bool_false = false;
       model.navBackImage = [UIImage imageNamed:@"icon_nav_back_gray"];
       model.navTitle =[[NSAttributedString alloc] initWithString:@""];
       model.logoImage = [UIImage imageNamed:@"logo_no_text.png"];
-//      model.loginBtnText = @"一键登录（推荐）";
       NSDictionary *normalAttributes = @{
           NSFontAttributeName: [UIFont systemFontOfSize:16 weight:UIFontWeightSemibold],
           NSForegroundColorAttributeName: [UIColor whiteColor]
@@ -152,11 +151,9 @@ bool bool_false = false;
       NSAttributedString *normalText = [[NSAttributedString alloc] initWithString:@"一键登录（推荐）" attributes:normalAttributes];
 
       model.loginBtnText = normalText;
-      model.loginBtnBgImgs = @[[UIImage imageNamed:@"button_unclick"],[UIImage imageNamed:@"button_unclick"]];
-      
+    
       model.alertBlurViewColor = UIColor.grayColor;
       model.privacyNavColor = UIColor.whiteColor;
-      model.privacyColors=@[UIColor.grayColor,UIColor.orangeColor];
       model.privacyOperatorPreText = @"《";
       model.privacyOperatorSufText = @"》";
       model.hideNavBackItem = YES;
@@ -167,7 +164,8 @@ bool bool_false = false;
       model.privacyNavBackImage = [UIImage imageNamed:@"icon_nav_back_gray.png"];
       model.privacyTwo = @[@"《平台隐私政策》",@"https://nest-h5.juhesaas.com/pages_h5/privacy-policy/index"];
       model.privacyNavTitleColor = UIColor.blackColor;
-      model.privacyAlertBtnBackgroundImages = @[[UIImage imageNamed:@"button_unclick"],[UIImage imageNamed:@"button_unclick"]];
+      
+    
       model.logoFrameBlock =  ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
           frame.size.width = 160;
           frame.size.height = 160;
@@ -175,23 +173,18 @@ bool bool_false = false;
           frame.origin.x = (superViewSize.width - 160) * 0.5;
           return frame;
       };
-    //    model.changeBtnIsHidden = YES;
-    //    model.checkBoxIsHidden = NO;
+
       model.sloganIsHidden = YES;
       model.numberColor=UIColor.blackColor;
       model.numberFont = [UIFont systemFontOfSize:26 weight:600];
       model.logoIsHidden =YES;
-    //    UIGestureRecognizer* wechatGR = [[UIGestureRecognizer alloc]initWithTarget:self action:@selector(closeClick:)];
       __block UIView* wechatView = [self loginView:@"weixin.png" btnName:@"微信登录"];
       [wechatView setTag:10000];
       
-    //    [wechatView addGestureRecognizer:wechatGR];
       __block UIView* checkCodeView = [self loginView:@"message.png" btnName:@"验证码登录"];
       [checkCodeView setTag:10001];
-    //    [checkCodeView addGestureRecognizer:wechatGR];
       __block UIView* pwdView = [self loginView:@"password.png" btnName:@"密码登录"];
       [pwdView setTag:10002];
-    //    [pwdView addGestureRecognizer:wechatGR];
       
        model.customViewBlock = ^(UIView * _Nonnull superCustomView) {
           [superCustomView addSubview:wechatView];
@@ -214,7 +207,6 @@ bool bool_false = false;
            CGRect pwdframe = pwdView.frame;
            pwdframe.origin.x = (contentViewFrame.size.width - frame.size.width) * 0.5+100;
            pwdframe.origin.y = CGRectGetMinY(privacyFrame) - pwdframe.size.height - 20;
-    //         pwdframe.size.width = 100;
            pwdView.frame = pwdframe;
        };
     [self loginWithModel: model complete:^{
@@ -428,6 +420,8 @@ bool bool_false = false;
   float timeout = 5.0; //self.tf_timeout.text.floatValue;
   __weak typeof(self) weakSelf = self;
   UIViewController *_vc = [self findCurrentViewController];
+    
+
     model.privacyAlertIsNeedShow = YES;
     model.privacyAlertMaskAlpha = 0.5;
     model.privacyAlertMaskColor = UIColor.blackColor;
@@ -439,7 +433,8 @@ bool bool_false = false;
     model.privacyAlertContentBackgroundColor = UIColor.whiteColor;
     model.privacyAlertTitleFont = [UIFont systemFontOfSize:16];
     model.privacyAlertTitleColor = UIColor.blackColor;
-    model.privacyAlertContentColors = @[UIColor.grayColor, UIColor.orangeColor];
+    model.privacyAlertContentColors = @[UIColor.grayColor,UIColor.orangeColor,];
+    
     model.privacyAlertContentAlignment = NSTextAlignmentLeft;
     
     model.privacyAlertBtnContent = @"同意并登录";
@@ -459,15 +454,16 @@ bool bool_false = false;
     model.privacyAlertPrivacyContentFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
         return CGRectMake(0+25, frame.origin.y+20, frame.size.width-50, frame.size.height);
     };
-//    privacyAlertBtnContent
+
+    UIImage *activeImage = [TXCommonUtils imageWithColor:[UIColor colorWithRed:255/255.0
+                                                                   green:140/255.0
+                                                                    blue:0/255.0
+                                                                   alpha:1.0] size:CGSizeMake(UIScreen.mainScreen.bounds.size.width*0.3, 40) isRoundedCorner:YES radius:20];
     
- 
-    
-//    UIImage *activeBtnImage = [TXCommonUtils imageWithColor:UIColor.redColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
-//    UIImage *hightLightBtnImage = [TXCommonUtils imageWithColor:UIColor.redColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
-    
-    model.privacyAlertBtnBackgroundImages = @[[UIImage imageNamed:@"button_unclick"],[UIImage imageNamed:@"button_unclick"]];;
-    
+    model.privacyAlertBtnBackgroundImages = @[
+        activeImage,
+        activeImage, 
+    ];
     model.privacyAlertFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
         return CGRectMake(40, (superViewSize.height - 150)*0.5, screenSize.width-80, 180);
     };

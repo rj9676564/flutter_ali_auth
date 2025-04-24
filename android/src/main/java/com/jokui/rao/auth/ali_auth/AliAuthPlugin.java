@@ -439,9 +439,18 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
         int dialogWidth = (int) (mScreenWidthDp * 3 / 4f);
         mAlicomAuthHelper.getReporter().setLoggerEnable(true);
         mAlicomAuthHelper.closeAuthPageReturnBack(true);
-        GradientDrawable roundedBg = new GradientDrawable();
-        roundedBg.setColor(mContext.getResources().getColor(R.color.colorAccent)); // 背景色
-        roundedBg.setCornerRadius(dp2px(mContext, 15)); // 圆角半径（单位像素）
+        GradientDrawable roundedBg1 = new GradientDrawable();
+        roundedBg1.setColor(mContext.getResources().getColor(R.color.colorAccent)); // 背景色
+        roundedBg1.setCornerRadius(dp2px(mContext, 30)); // 圆角半径（单位像素）
+        GradientDrawable roundedBg2 = new GradientDrawable();
+        roundedBg2.setColor(mContext.getResources().getColor(R.color.colorAccent)); // 背景色
+        roundedBg2.setCornerRadius(dp2px(mContext, 30)); // 圆角半径（单位像素）
+        GradientDrawable roundedBg3 = new GradientDrawable();
+        roundedBg3.setColor(mContext.getResources().getColor(R.color.colorAccent)); // 背景色
+        roundedBg3.setCornerRadius(dp2px(mContext, 30)); // 圆角半径（单位像素）
+
+//        Drawable btnDrawable = mContext.getResources().getDrawable(R.drawable.login_btn_press);;
+
         mAuthHelper.addPrivacyRegisterXmlConfig(new AuthRegisterXmlConfig.Builder()
                 .setLayout(R.layout.custom_privacy_port, new AbstractPnsViewDelegate() {
                     @Override
@@ -462,16 +471,13 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 .setNavReturnHidden(true)
                 .setNavHidden(true)
                 .setSwitchAccHidden(true)
-                .setAppPrivacyColor(Color.GRAY, Color.parseColor("#002E00"))
+                .setAppPrivacyColor(Color.GRAY, Color.parseColor("#FF8C00"))
                 .setSwitchAccHidden(false)
                 .setLogBtnToastHidden(true)
                 .setPrivacyState(false)
                 .setCheckboxHidden(false)
                 .setLightColor(false)
                 .setCheckboxHidden(false)
-//                .setStatusBarHidden(true)
-//                .setStatusBarColor(Color.WHITE)
-//                .setStatusBarUIFlag(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
                 .setSloganHidden(true)
                 .setWebNavTextSizeDp(20)
                 .setNumberSizeDp(30)
@@ -481,22 +487,17 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 .setLogoHeight(120)
                 .setLogoOffsetY(40)
                 .setSwitchAccHidden(true)
-//                .setAuthPageActIn("in_activity", "out_activity")
-//                .setAuthPageActOut("in_activity", "out_activity")
                 .setVendorPrivacyPrefix("《")
                 .setVendorPrivacySuffix("》")
-//                .setPageBackgroundPath("page_background_color")
                 .setLogoImgPath("logo_no_text")
-//                .setLogBtnBackgroundPath("login_btn_bg")
-                .setLogBtnBackgroundDrawable(roundedBg)
-//                .setScreenOrientation(authPageOrientation)
+                .setLogBtnBackgroundDrawable(roundedBg1)
                 .setWebNavColor(Color.WHITE)
                 .setWebViewStatusBarColor(Color.WHITE)
                 .setWebNavTextColor(Color.BLACK)
                 .setWebNavReturnImgPath("icon_nav_back_gray")
 
                 //二次弹窗
-                .setPrivacyAlertIsNeedShow(true)
+                .setPrivacyAlertIsNeedShow(false)
                 .setPrivacyAlertIsNeedAutoLogin(true)
                 .setPrivacyAlertTitleContent("温馨提示")
                 .setPrivacyAlertBackgroundColor(Color.WHITE)
@@ -513,7 +514,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                 .privacyAlertProtocolNameUseUnderLine(true)
                 .setPrivacyAlertBtnOffsetX(160)
                 .setPrivacyAlertBtnOffsetY(45)
-                .setPrivacyAlertBtnBackgroundImgDrawable(roundedBg)
+                .setPrivacyAlertBtnBackgroundImgDrawable(roundedBg2)
                 .setPrivacyAlertBtnWidth(100)
                 .setPrivacyAlertBtnHeigth(30)
                 .setPrivacyAlertBtnTextColor(Color.WHITE)
@@ -708,7 +709,7 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                     @Override
                     public void onClick(View v) {
                         Log.d(TAG, "您点击了第" + finalI + "个按钮");
-                        mAlicomAuthHelper.quitLoginPage();
+
                         JSONObject jsonObject = new JSONObject();
                         if (finalI == 0) {
                             jsonObject.put("data", "10000");
@@ -717,10 +718,12 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
                         if (finalI == 1) {
                             jsonObject.put("data", "10001");
                             jsonObject.put("code", "10001");
+                            mAlicomAuthHelper.quitLoginPage();
                         }
                         if (finalI == 2) {
                             jsonObject.put("data", "10002");
                             jsonObject.put("code", "10002");
+                            mAlicomAuthHelper.quitLoginPage();
                         }
 
                         jsonObject.put("msg", "点击第三方登录按钮");

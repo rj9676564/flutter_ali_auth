@@ -46,14 +46,18 @@
     // model.sloganText = [[NSAttributedString alloc] initWithString:@"一键登录slogan文案" attributes:@{NSForegroundColorAttributeName : UIColor.orangeColor,NSFontAttributeName : [UIFont systemFontOfSize:16.0]}];
     model.numberColor = [self colorWithHex:0x3971fe alpha: 1];
     model.numberFont = [UIFont systemFontOfSize:30.0];
-    model.loginBtnText = [[NSAttributedString alloc] initWithString:@"一键登录" attributes:@{NSForegroundColorAttributeName : UIColor.whiteColor,NSFontAttributeName : [UIFont systemFontOfSize:20.0]}];
+//    model.loginBtnText = [[NSAttributedString alloc] initWithString:@"一键登录" attributes:@{NSForegroundColorAttributeName : UIColor.whiteColor,NSFontAttributeName : [UIFont systemFontOfSize:20.0]}];
 //    model.loginBtnBgImgs = @[
 //      [UIImage imageNamed:@"button_click"],
 //      [UIImage imageNamed:@"button_unclick"],
 //      [UIImage imageNamed:@"button_click"]
 //    ];
-    UIImage *activeImage = [TXCommonUtils imageWithColor:UIColor.orangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
-    UIImage *hightLightImage = [TXCommonUtils imageWithColor:UIColor.systemOrangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:10];
+//    UIImage *activeImage = [TXCommonUtils imageWithColor:UIColor.orangeColor size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:25];
+    UIImage *activeImage = [TXCommonUtils imageWithColor:[UIColor colorWithRed:255/255.0
+                                                                   green:140/255.0
+                                                                    blue:0/255.0
+                                                                   alpha:1.0] size:CGSizeMake(UIScreen.mainScreen.bounds.size.width - 2 * 18, 50) isRoundedCorner:YES radius:25];
+    
     model.loginBtnBgImgs = @[
         activeImage,
         activeImage,
