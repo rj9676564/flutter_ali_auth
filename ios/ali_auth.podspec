@@ -15,6 +15,11 @@ Pod::Spec.new do |s|
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
+  s.dependency 'SDWebImage'
+  s.dependency 'MJExtension'
+  s.dependency 'MBProgressHUD'
+
+  s.frameworks = 'Network'
 
   s.vendored_frameworks = 'libs/ATAuthSDK.framework', 'libs/YTXMonitor.framework', 'libs/YTXOperators.framework'
   s.static_framework = false
@@ -28,7 +33,7 @@ Pod::Spec.new do |s|
   # 加载静态资源
   s.resources = ['Assets/*']
 
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '11.0'
   # s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
   s.pod_target_xcconfig = {'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64'   }
   s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
