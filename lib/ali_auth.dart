@@ -53,8 +53,6 @@ class AliAuthPlugin {
     });
   }
 
-  @Deprecated('该接口将在 v0.0.6 之前可继续使用，在以后版本执行删除，请尽快修改')
-
   /// SDK判断网络环境是否支持
   static Future<bool?> get checkVerifyEnable async {
     return await _channel.invokeMethod("checkVerifyEnable");

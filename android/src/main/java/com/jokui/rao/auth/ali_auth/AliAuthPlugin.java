@@ -119,10 +119,12 @@ public class AliAuthPlugin extends FlutterActivity implements FlutterPlugin, Met
     // them functionally equivalent. Only one of onAttachedToEngine or registerWith will be called
     // depending on the user's project. onAttachedToEngine or registerWith must both be defined
     // in the same class.
+    /*
     public static void registerWith(PluginRegistry.Registrar registrar) {
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "ali_auth");
         channel.setMethodCallHandler(new AliAuthPlugin());
     }
+    */
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
