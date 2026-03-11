@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface PNSBuildModelUtils : NSObject
 
 /// 
-+ (FlutterViewController *) flutterVC;
++ (nullable FlutterViewController *) flutterVC;
 
 /// 创建全屏的model
 + (TXCustomModel *)buildFullScreenModel;

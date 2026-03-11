@@ -1009,19 +1009,63 @@
 
 #pragma mark  assets -> 转换成真实路径
 + (NSString *) changeUriToPath:(NSString *) key{
-  NSString* keyPath = [[self flutterVC] lookupKeyForAsset: key];
-  NSString* path = [[NSBundle mainBundle] pathForResource: keyPath ofType:nil];
+  if (key == nil || key == (id)kCFNull || ![key isKindOfClass:[NSString class]]) {
+    return nil;
+  }
+  NSString *assetKey = (NSString *)key;
+  if (assetKey.length == 0) {
+    return nil;
+  }
+  NSString *keyPath = [FlutterDartProject lookupKeyForAsset:assetKey];
+  if (keyPath == nil || keyPath.length == 0) {
+    keyPath = assetKey;
+  }
+  NSString *path = [[NSBundle mainBundle] pathForResource:keyPath ofType:nil];
+  if (path == nil || path.length == 0) {
+    path = [[NSBundle mainBundle] pathForResource:assetKey ofType:nil];
+  }
   return path;
 }
 
 + (UIImage *) changeUriPathToImage:(NSString *) key{
+  if (key == nil || key == (id)kCFNull || ![key isKindOfClass:[NSString class]]) {
+    return nil;
+  }
   NSString* path = [self changeUriToPath: key];
+  if (path == nil || path.length == 0) {
+    return nil;
+  }
   UIImage * image = [UIImage imageWithContentsOfFile: path];
   return image;
 }
 
 +(FlutterViewController *)flutterVC{
-  return (FlutterViewController *)[self findCurrentViewController];
+  UIViewController *root = [self getRootViewController];
+  if ([root isKindOfClass:[FlutterViewController class]]) {
+    return (FlutterViewController *)root;
+  }
+  if ([root isKindOfClass:[UINavigationController class]]) {
+    for (UIViewController *vc in [((UINavigationController *)root).viewControllers reverseObjectEnumerator]) {
+      if ([vc isKindOfClass:[FlutterViewController class]]) {
+        return (FlutterViewController *)vc;
+      }
+    }
+  }
+  if ([root isKindOfClass:[UITabBarController class]]) {
+    UITabBarController *tab = (UITabBarController *)root;
+    UIViewController *selected = tab.selectedViewController;
+    if ([selected isKindOfClass:[FlutterViewController class]]) {
+      return (FlutterViewController *)selected;
+    }
+    if ([selected isKindOfClass:[UINavigationController class]]) {
+      for (UIViewController *vc in [((UINavigationController *)selected).viewControllers reverseObjectEnumerator]) {
+        if ([vc isKindOfClass:[FlutterViewController class]]) {
+          return (FlutterViewController *)vc;
+        }
+      }
+    }
+  }
+  return nil;
 }
 
 + (UIViewController *)getRootViewController {

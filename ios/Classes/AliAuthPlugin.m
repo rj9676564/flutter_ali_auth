@@ -419,7 +419,52 @@ bool bool_false = false;
 - (void)loginWithModel:(TXCustomModel *)model  complete:(void (^)(void))completion {
   float timeout = 5.0; //self.tf_timeout.text.floatValue;
   __weak typeof(self) weakSelf = self;
-  UIViewController *_vc = [self findCurrentViewController];
+  UIViewController *_vc = [self findAuthPresentationViewController];
+  if (_vc == nil) {
+    _vc = [self findCurrentViewController];
+  }
+  if (_vc == nil) {
+    _vc = [self getRootViewController];
+  }
+  __block BOOL hasRetriedWithRootController = NO;
+  __block void (^requestLoginToken)(UIViewController *);
+  requestLoginToken = ^(UIViewController *controller) {
+    UIViewController *safeController = controller;
+    if (safeController == nil) {
+      safeController = [weakSelf getRootViewController];
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [[TXCommonHandler sharedInstance] getLoginTokenWithTimeout:timeout controller:safeController model:model complete:^(NSDictionary * _Nonnull resultDic) {
+          NSString *code = [resultDic objectForKey:@"resultCode"];
+          NSString *msg = [resultDic objectForKey:@"msg"];
+
+          if (!hasRetriedWithRootController &&
+              [msg isKindOfClass:[NSString class]] &&
+              (([msg rangeOfString:@"vc类型不支持" options:NSCaseInsensitiveSearch].location != NSNotFound) ||
+               ([msg rangeOfString:@"VC类型不支持" options:NSCaseInsensitiveSearch].location != NSNotFound))) {
+            UIViewController *rootController = [weakSelf getRootViewController];
+            if (rootController != nil && rootController != safeController) {
+              hasRetriedWithRootController = YES;
+              requestLoginToken(rootController);
+              return;
+            }
+          }
+
+          if ([PNSCodeSuccess isEqualToString:code]) {
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
+              });
+          } else if ([PNSCodeLoginControllerClickCancel isEqualToString:code]) {
+            [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
+          } else if ([PNSCodeCarrierChanged isEqualToString:code]) {
+            [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
+          } else if ([PNSCodeLoginControllerClickChangeBtn isEqual: code]){
+            [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
+          }
+        [weakSelf showResult:resultDic];
+      }];
+    });
+  };
     
 
     model.privacyAlertIsNeedShow = YES;
@@ -520,21 +565,7 @@ bool bool_false = false;
             }
             
             //3. 调用获取登录Token接口，可以立马弹起授权页
-            [[TXCommonHandler sharedInstance] getLoginTokenWithTimeout:timeout controller:_vc model:model complete:^(NSDictionary * _Nonnull resultDic) {
-                NSString *code = [resultDic objectForKey:@"resultCode"];
-                if ([PNSCodeSuccess isEqualToString:code]) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
-                    });
-                } else if ([PNSCodeLoginControllerClickCancel isEqualToString:code]) {
-                  [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
-                } else if ([PNSCodeCarrierChanged isEqualToString:code]) {
-                  [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
-                } else if ([PNSCodeLoginControllerClickChangeBtn isEqual: code]){
-                  [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
-                }
-              [weakSelf showResult:resultDic];
-            }];
+            requestLoginToken(_vc);
         }];
     }];
 }
@@ -768,14 +799,23 @@ bool bool_false = false;
 
 #pragma mark - 获取到跟视图
 - (UIViewController *)getRootViewController {
-    UIWindow *window = [[[UIApplication sharedApplication] delegate] window];
+    UIWindow *window = [self activeWindow];
+    if (window == nil) {
+      window = [[[UIApplication sharedApplication] delegate] window];
+    }
     return window.rootViewController;
 }
 
 #pragma mark  ======在view上添加UIViewController========
 - (UIViewController *)findCurrentViewController{
-    UIWindow *window = [[UIApplication sharedApplication].delegate window];
+    UIWindow *window = [self activeWindow];
+    if (window == nil) {
+      window = [[UIApplication sharedApplication].delegate window];
+    }
     UIViewController *topViewController = [window rootViewController];
+    if (topViewController == nil) {
+      return nil;
+    }
     while (true) {
         if (topViewController.presentedViewController) {
             topViewController = topViewController.presentedViewController;
@@ -789,6 +829,73 @@ bool bool_false = false;
         }
     }
     return topViewController;
+}
+
+- (UIViewController *)findAuthPresentationViewController {
+    UIWindow *window = [self activeWindow];
+    if (window == nil) {
+      window = [[UIApplication sharedApplication].delegate window];
+    }
+    UIViewController *controller = window.rootViewController;
+    if (controller == nil) {
+      return nil;
+    }
+
+    while (true) {
+      if ([controller isKindOfClass:[UINavigationController class]]) {
+        UIViewController *visible = ((UINavigationController *)controller).visibleViewController;
+        if (visible == nil) {
+          visible = ((UINavigationController *)controller).topViewController;
+        }
+        if (visible != nil) {
+          controller = visible;
+          continue;
+        }
+      }
+
+      if ([controller isKindOfClass:[UITabBarController class]]) {
+        UIViewController *selected = ((UITabBarController *)controller).selectedViewController;
+        if (selected != nil) {
+          controller = selected;
+          continue;
+        }
+      }
+
+      UIViewController *presented = controller.presentedViewController;
+      if (presented != nil && ![presented isKindOfClass:[UIAlertController class]]) {
+        controller = presented;
+        continue;
+      }
+      break;
+    }
+
+    if ([controller isKindOfClass:[UIAlertController class]] && controller.presentingViewController != nil) {
+      return controller.presentingViewController;
+    }
+    return controller;
+}
+
+- (UIWindow *)activeWindow {
+  if (@available(iOS 13.0, *)) {
+    for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
+      if (![scene isKindOfClass:[UIWindowScene class]]) {
+        continue;
+      }
+      if (scene.activationState != UISceneActivationStateForegroundActive) {
+        continue;
+      }
+      UIWindowScene *windowScene = (UIWindowScene *)scene;
+      for (UIWindow *window in windowScene.windows) {
+        if (window.isKeyWindow) {
+          return window;
+        }
+      }
+      if (windowScene.windows.count > 0) {
+        return windowScene.windows.firstObject;
+      }
+    }
+  }
+  return [UIApplication sharedApplication].keyWindow;
 }
 
 - (void)cancelPrivacyAlert:(UIButton *)btn {
